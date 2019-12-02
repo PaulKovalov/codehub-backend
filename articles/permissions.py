@@ -4,7 +4,7 @@ from rest_framework import permissions
 class ArticlePermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        if request.method == 'GET':
+        if request.method == 'GET' or request.method == 'OPTIONS':
             return True
         return request.user.is_authenticated
 

@@ -21,3 +21,9 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+
+class ViewUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CodehubUser
+        fields = ('id', 'username', 'articles', 'tutorials')

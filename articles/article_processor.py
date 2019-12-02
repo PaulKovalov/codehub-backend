@@ -5,8 +5,9 @@ Pavlo Kovalov 2019
 """
 
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
+
 from codehub import config
+
 
 class ArticleProcessor:
 

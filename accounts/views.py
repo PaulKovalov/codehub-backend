@@ -5,7 +5,7 @@ Pavlo Kovalov 2019
 from rest_framework import viewsets, mixins
 
 from accounts.models import CodehubUser
-from accounts.permissions import UsersPermissions
+from accounts.permissions import UsersPermissions, ViewUserPermission
 from accounts.serializers import UserSerializer
 
 
@@ -17,3 +17,8 @@ class UserViewSet(mixins.RetrieveModelMixin,
     serializer_class = UserSerializer
     permission_class = [UsersPermissions]
     queryset = CodehubUser.objects.all()
+
+
+class ViewUserViewSet(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    permission_class = [ViewUserPermission]
