@@ -1,16 +1,17 @@
 """
-Codehub Accounts API urls
+Codehub Home API urls
 Pavlo Kovalov 2019
 """
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from .views import UserViewSet
+from home import views
 
 router = DefaultRouter()
-router.register(r'accounts', UserViewSet, basename='accounts')
+router.register(r'errors', views.ErrorMessagesViewSet)
 
 urlpatterns = [
+    path('get-csrf', views.get_csrf),
     path('', include(router.urls)),
 ]

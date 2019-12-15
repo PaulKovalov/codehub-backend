@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from rest_framework import serializers
 
 from .models import CodehubUser
@@ -21,6 +22,21 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+
+class UserAuthenticationSerializer(serializers.Serializer):
+    WRONG_CREDENTIALS = 'Invalid email or password'
+    email = serializers.EmailField(max_length=255)
+    password = serializers.CharField(max_length=255)
+
+    def validate(self, attrs):
+        email = attrs['email'].lower()
+        password = attrs['passwor']
+        account = authenticate(request=self.context['request'], email=email, password=password)
+        if account is None:
+            raise serializers.ValidationError(self.WRONG_CREDENTIALS)
+        attrs['account'] = account
+        return attrs
 
 
 class ViewUserSerializer(serializers.ModelSerializer):

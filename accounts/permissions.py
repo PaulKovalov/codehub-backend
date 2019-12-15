@@ -4,7 +4,7 @@ from rest_framework import permissions
 class UsersPermissions(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        if view.action == 'create':
+        if view.action == 'create' or view.action == 'login' or view.action == 'me':
             return True
         return False
 
