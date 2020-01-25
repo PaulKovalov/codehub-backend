@@ -7,7 +7,7 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from accounts.models import CodehubUser
+from accounts.models import User
 from accounts.permissions import UsersPermissions, ViewUserPermission
 from accounts.serializers import UserSerializer, UserAuthenticationSerializer
 
@@ -19,7 +19,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
     serializer_class = UserSerializer
     permission_class = [UsersPermissions]
-    queryset = CodehubUser.objects.all()
+    queryset = User.objects.all()
 
     @action(methods=['POST'], detail=False, serializer_class=UserAuthenticationSerializer)
     def login(self, request):

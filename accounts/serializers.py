@@ -1,12 +1,12 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
-from .models import CodehubUser
+from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CodehubUser
+        model = User
         fields = ('id', 'username', 'password', 'email')
         extra_kwargs = {
             'password': {'write_only': True},
@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        user = CodehubUser(
+        user = User(
             username=validated_data['username'],
             email=validated_data['email'],
         )
@@ -32,9 +32,9 @@ class UserAuthenticationSerializer(serializers.Serializer):
     def validate(self, attrs):
         def email_authentication(user_email, user_password):
             try:
-                username = CodehubUser.objects.get(email=user_email).username
+                username = User.objects.get(email=user_email).username
                 return authenticate(username=username, password=user_password)
-            except CodehubUser.DoesNotExist:
+            except User.DoesNotExist:
                 raise serializers.ValidationError(self.WRONG_CREDENTIALS)
         email = attrs['email'].lower()
         password = attrs['password']
@@ -47,5 +47,5 @@ class UserAuthenticationSerializer(serializers.Serializer):
 
 class ViewUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CodehubUser
+        model = User
         fields = ('id', 'username', 'articles', 'tutorials')
