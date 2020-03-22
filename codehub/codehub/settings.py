@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # custom apps
+    'channels',
     'rest_framework',
 ]
 
@@ -88,59 +89,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'console': {
-            'format': '%(name)-12s %(levelname)-8s %(message)s'
-        },
-        'file': {
-            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
-        }
-    },
-    'handlers': {
-        'info': {
-            'level': 'INFO',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'when': 'midnight',
-            'formatter': 'file',
-            'filename': os.path.join(BASE_DIR, 'logs/info.log'),
-            'backupCount': 10
-        },
-        'warning': {
-            'level': 'WARNING',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'when': 'midnight',
-            'formatter': 'file',
-            'filename': os.path.join(BASE_DIR, 'logs/warning.log'),
-            'backupCount': 10
-        },
-        'error': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'when': 'midnight',
-            'formatter': 'file',
-            'filename': os.path.join(BASE_DIR, 'logs/error.log'),
-            'backupCount': 10
-        },
-        'critical': {
-            'level': 'CRITICAL',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'when': 'midnight',
-            'formatter': 'file',
-            'filename': os.path.join(BASE_DIR, 'logs/critical.log'),
-            'backupCount': 10
-        }
-    },
-    'loggers': {
-        '': {
-            'level': 'INFO',
-            'handlers': ['info', 'warning', 'error', 'critical']
-        }
-    }
-}
-
 AUTH_USER_MODEL = "accounts.User"
 
 LANGUAGE_CODE = 'en-us'
@@ -163,3 +111,10 @@ ARTICLE_CONTENT_MIN_LENGTH = 64
 
 TUTORIAL_TITLE_MIN_LENGTH = 8
 TUTORIAL_TITLE_MAX_LENGTH = 128
+
+# asgi setup
+ASGI_APPLICATION = 'codehub.routing.application'
+
+# static files setup
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
+STATIC_URL = '/static/'
