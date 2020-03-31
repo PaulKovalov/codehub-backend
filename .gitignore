@@ -3,6 +3,9 @@ __pycache__/
 *$py.class
 /logs/
 /staticfiles/
-/config/backend.env
-/config/db.env
+/config/*.env
 /.idea/
+/codehub-backend.tar
+/codehub-frontend.tar
+/codehub-nginx.tar
+/codehub-postgres.tar

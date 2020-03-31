@@ -21,6 +21,8 @@ services:
     container_name: 'angular'
     expose:
       - '4200'
+    env_file:
+      - ./config/angular.env
   nginx:
     image: codehub-nginx
     container_name: 'nginx_main'
