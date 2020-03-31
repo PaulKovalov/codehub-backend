@@ -3,7 +3,7 @@ CodeHub accounts view
 Pavlo Kovalov 2019
 """
 from django.contrib.auth import login, logout
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -34,12 +34,12 @@ class UserViewSet(mixins.RetrieveModelMixin,
         logout(request, request.user)
         return Response()
 
-    @action(methods=['GET'], detail=False)
-    def me(self, request):
-        if request.user.is_authenticated:
-            return Response(UserSerializer(request.user).data)
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+    def get_object(self):
+        if self.kwargs[self.lookup_field] == 'me' and self.request.user.is_authenticated:
+            user = self.request.user
+            self.check_object_permissions(self.request, user)
+            return user
+        return super().get_object()
 
 
 class ViewUserViewSet(viewsets.ModelViewSet):
