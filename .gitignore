@@ -1,11 +1,82 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-/logs/
-/staticfiles/
-/config/*.env
-/.idea/
+.idea/
+# C extensions
+*.so
+
+# docker images converted to tar
 /codehub-backend.tar
 /codehub-frontend.tar
 /codehub-nginx.tar
 /codehub-postgres.tar
+
+# editorconfig
+/.idea/
+.editorconfig
+
+#local_env
+env
+/config/*.env
+.env
+
+# Distribution / packaging
+.Python
+env/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Django stuff:
+*.log
+local_settings.py
+
+# PyBuilder
+target/
+
+# pyenv
+.python-version
+
+# virtualenv
+venv/
+ENV/
+
+*.DS_Store
+*.pid
+
+/node_modules/
+/codehub/static/bin/
+/docker-compose.yml
+
+/testing/test_results/
