@@ -30,18 +30,12 @@ class UserAuthenticationSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=255)
 
     def validate(self, attrs):
-        def email_authentication(user_email, user_password):
-            try:
-                username = User.objects.get(email=user_email).username
-                return authenticate(username=username, password=user_password)
-            except User.DoesNotExist:
-                raise serializers.ValidationError(self.WRONG_CREDENTIALS)
         email = attrs['email'].lower()
         password = attrs['password']
-        account = email_authentication(email, password)
-        if account is None:
+        user = authenticate(username=email, password=password)
+        if user is None:
             raise serializers.ValidationError(self.WRONG_CREDENTIALS)
-        attrs['account'] = account
+        attrs['account'] = user
         return attrs
 
 

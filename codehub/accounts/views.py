@@ -21,6 +21,10 @@ class UserViewSet(mixins.RetrieveModelMixin,
     permission_class = [UsersPermissions]
     queryset = User.objects.all()
 
+    def perform_create(self, serializer):
+        new_user = serializer.save()
+        login(self.request, new_user)
+
     @action(methods=['POST'], detail=False, serializer_class=UserAuthenticationSerializer)
     def login(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -29,9 +33,9 @@ class UserViewSet(mixins.RetrieveModelMixin,
         login(request, validated_data['account'])
         return Response()
 
-    @action(methods=['POST'], detail=False)
+    @action(methods=['GET'], detail=False)
     def logout(self, request):
-        logout(request, request.user)
+        logout(request)
         return Response()
 
     def get_object(self):

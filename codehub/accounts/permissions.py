@@ -1,17 +1,11 @@
 from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS
 
 
 class UsersPermissions(permissions.BasePermission):
 
-    def has_permission(self, request, view):
-        if view.action == 'create' or view.action == 'login' or view.action == 'me':
-            return True
-        return False
-
     def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
-            return False
-        return request.user == obj
+        return request.method in SAFE_METHODS or obj == request.user
 
 
 class ViewUserPermission(permissions.BasePermission):
