@@ -48,3 +48,11 @@ class TestArticleCreate(TestCase):
         }
         response = self.client.patch(url, patch_data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_list_articles(self):
+        article_count = 5
+        mommy.make(Article, published=True, _quantity=article_count)
+        url = reverse('articles-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()['results']), article_count)

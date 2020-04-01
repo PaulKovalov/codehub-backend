@@ -40,3 +40,10 @@ class ArticleSerializer(serializers.ModelSerializer):
                 raise ValidationError('This field can be edited only by superuser')
         instance.save()
         return instance
+
+
+class ListArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        read_only_fields = ('date_created', 'views', 'estimate_reading_time', 'author', 'title')
+        fields = read_only_fields

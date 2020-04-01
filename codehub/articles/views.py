@@ -7,7 +7,7 @@ from rest_framework import viewsets
 
 from articles.models import Article
 from articles.permissions import ArticlePermission
-from articles.serializers import ArticleSerializer
+from articles.serializers import ArticleSerializer, ListArticleSerializer
 from articles.utils import ArticlePaginator
 
 
@@ -19,3 +19,8 @@ class ArticlesViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.action == 'list':
+            return ListArticleSerializer
+        return super().get_serializer_class()
