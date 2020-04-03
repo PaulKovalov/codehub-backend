@@ -8,6 +8,7 @@ from rest_framework import viewsets
 from articles.models import Article
 from articles.permissions import ArticlePermission
 from articles.serializers import ArticleSerializer, ListArticleSerializer
+from articles.tools import get_preview, get_reading_time
 from articles.utils import ArticlePaginator
 
 
@@ -18,7 +19,9 @@ class ArticlesViewSet(viewsets.ModelViewSet):
     queryset = Article.objects
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        text = serializer.validated_data['text']
+        serializer.save(author=self.request.user, preview=get_preview(text),
+                        estimate_reading_time=get_reading_time(text))
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action == 'list':

@@ -45,5 +45,5 @@ class ArticleSerializer(serializers.ModelSerializer):
 class ListArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        read_only_fields = ('date_created', 'views', 'estimate_reading_time', 'author', 'title')
+        read_only_fields = ('date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview')
         fields = read_only_fields
