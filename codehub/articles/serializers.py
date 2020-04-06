@@ -47,3 +47,11 @@ class ListArticleSerializer(serializers.ModelSerializer):
         model = Article
         read_only_fields = ('date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview')
         fields = read_only_fields
+
+
+class MyArticlesListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        read_only_fields = (
+            'date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview', 'published', 'id')
+        fields = read_only_fields
