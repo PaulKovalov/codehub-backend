@@ -23,7 +23,7 @@ class ArticlesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = Article.objects.filter(published=True)
-        if self.action == 'my':
+        if self.action == 'my' or self.action == 'retrieve':
             qs = qs | Article.objects.filter(author=self.request.user)
         return qs
 
