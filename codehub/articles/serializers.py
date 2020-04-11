@@ -13,7 +13,7 @@ from articles.models import Article
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        read_only_fields = ('date_created', 'views', 'id', 'estimate_reading_time', 'author')
+        read_only_fields = ('date_created', 'views', 'id', 'estimate_reading_time', 'author', 'username')
         fields = ('title', 'text', 'published') + read_only_fields
 
     def validate_title(self, value):
@@ -45,7 +45,8 @@ class ArticleSerializer(serializers.ModelSerializer):
 class ListArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        read_only_fields = ('date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview')
+        read_only_fields = (
+            'id', 'date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview', 'username')
         fields = read_only_fields
 
 
@@ -53,5 +54,6 @@ class MyArticlesListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         read_only_fields = (
-            'date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview', 'published', 'id')
+            'id', 'date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview', 'published',
+            'username')
         fields = read_only_fields

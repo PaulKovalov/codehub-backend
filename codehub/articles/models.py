@@ -20,3 +20,7 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def username(self):
+        return self.author.username
