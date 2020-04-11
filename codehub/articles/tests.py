@@ -1,3 +1,5 @@
+import datetime
+
 from django.test import TestCase
 from django.urls import reverse
 from model_mommy import mommy
@@ -6,6 +8,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import User
 from articles.models import Article
+from articles.serializers import ListArticleSerializer
 
 
 class TestArticleCreate(TestCase):
@@ -27,20 +30,8 @@ class TestArticleCreate(TestCase):
         self.assertFalse(response_json['published'])
         self.assertEqual(response_json['author'], self.author.pk)
 
-    def test_publish_article_admin(self):
-        article = mommy.make(Article)
-        admin = User.objects.create_superuser(email='root@code-hub.org', password='123456')
-        self.client.force_authenticate(admin)
-        url = reverse('articles-detail', kwargs={'pk': article.pk})
-        patch_data = {
-            'published': True
-        }
-        response = self.client.patch(url, patch_data)
-        self.assertTrue(response.json()['published'])
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
     def test_publish_article_user(self):
-        article = mommy.make(Article)
+        article = mommy.make(Article, author=self.author)
         self.client.force_authenticate(self.author)
         url = reverse('articles-detail', kwargs={'pk': article.pk})
         patch_data = {
@@ -56,3 +47,14 @@ class TestArticleCreate(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()['results']), article_count)
+
+    def test_recent_articles(self):
+        recent_article = mommy.make(Article, published=True)
+        old_article = mommy.make(Article, published=True)
+        old_article.date_created = (datetime.date.today() - datetime.timedelta(days=2))
+        old_article.save()
+        url = reverse('articles-recent')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0], ListArticleSerializer(recent_article).data)

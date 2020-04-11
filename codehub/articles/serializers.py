@@ -5,7 +5,7 @@ Pavlo Kovalov 2019
 
 from django.conf import settings
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied
 
 from articles.models import Article
 
@@ -37,7 +37,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             if user.is_superuser:
                 instance.published = published
             else:
-                raise ValidationError('This field can be edited only by superuser')
+                raise PermissionDenied('This field can be edited only by superuser')
         instance.save()
         return instance
 

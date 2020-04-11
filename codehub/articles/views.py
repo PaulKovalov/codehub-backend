@@ -2,6 +2,7 @@
 Codehub Article API endpoints
 Pavlo Kovalov 2019
 """
+import datetime
 
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -21,9 +22,10 @@ class ArticlesViewSet(viewsets.ModelViewSet):
     pagination_class = ArticlePaginator
 
     def get_queryset(self):
+        qs = Article.objects.filter(published=True)
         if self.action == 'my':
-            return Article.objects.filter(author=self.request.user)
-        return Article.objects.filter(published=True)
+            qs = qs | Article.objects.filter(author=self.request.user)
+        return qs
 
     def perform_create(self, serializer):
         text = serializer.validated_data['text']
@@ -45,3 +47,10 @@ class ArticlesViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data)
+
+    @action(methods=['GET'], detail=False)
+    def recent(self, request, *args, **kwargs):
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        qs = self.get_queryset()
+        qs = qs.filter(date_created__gt=yesterday).order_by('views')[:5]
+        return Response(ListArticleSerializer(qs, many=True).data)
