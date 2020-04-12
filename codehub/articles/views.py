@@ -23,8 +23,9 @@ class ArticlesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = Article.objects.filter(published=True)
-        if self.action == 'my' or self.action == 'retrieve' or self.action == 'partial_update':
-            qs = qs | Article.objects.filter(author=self.request.user)
+        if self.request.user.is_authenticated:
+            if self.action == 'my' or self.action == 'partial_update':
+                return Article.objects.filter(author=self.request.user)
         return qs
 
     def perform_create(self, serializer):
