@@ -21,6 +21,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'articles.apps.ArticlesConfig',
+    'tutorials.apps.TutorialsConfig',
     'home.apps.HomeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -111,6 +112,7 @@ ARTICLE_CONTENT_MIN_LENGTH = 64
 
 TUTORIAL_TITLE_MIN_LENGTH = 8
 TUTORIAL_TITLE_MAX_LENGTH = 128
+TUTORIAL_PREVIEW_MAX_LENGTH = 1024
 
 # asgi setup
 ASGI_APPLICATION = 'codehub.routing.application'

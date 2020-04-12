@@ -1,8 +1,9 @@
 version: '3.0'
 services:
   api-server:
-    image: codehub-backend
+    image: code-hub.org:5000/codehub-backend
     container_name: 'api_server'
+    restart: always
     depends_on:
       - postgres
     expose:
@@ -10,22 +11,25 @@ services:
     env_file:
       - ./config/backend.env
   postgres:
-    image: codehub-postgres
+    image: code-hub.org:5000/codehub-postgres
     container_name: 'postgresql'
+    restart: always
     expose:
       - '5432'
     env_file:
       - ./config/db.env
   angular:
-    image: codehub-frontend
+    image: code-hub.org:5000/codehub-frontend
     container_name: 'angular'
+    restart: always
     expose:
       - '4200'
     env_file:
       - ./config/angular.env
   nginx:
-    image: codehub-nginx
+    image: code-hub.org:5000/codehub-nginx
     container_name: 'nginx_main'
+    restart: always
     ports:
       - '80:80'
     links:
