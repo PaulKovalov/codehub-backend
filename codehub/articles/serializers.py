@@ -32,12 +32,19 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         published = validated_data.get('published')
+        new_text = validated_data.get('text')
+        new_title = validated_data.get('title')
         if published is not None:
             user = self.context.get('request').user
             if user.is_superuser:
                 instance.published = published
             else:
                 raise PermissionDenied('This field can be edited only by superuser')
+        if new_text:
+            instance.text = new_text
+        if new_title:
+            instance.title = new_title
+        instance.published = False
         instance.save()
         return instance
 

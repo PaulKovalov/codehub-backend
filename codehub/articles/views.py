@@ -23,7 +23,7 @@ class ArticlesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = Article.objects.filter(published=True)
-        if self.action == 'my' or self.action == 'retrieve':
+        if self.action == 'my' or self.action == 'retrieve' or self.action == 'partial_update':
             qs = qs | Article.objects.filter(author=self.request.user)
         return qs
 
@@ -47,6 +47,18 @@ class ArticlesViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data)
+
+    @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated], url_name='my-articles-count',
+            url_path='my/count')
+    def my_count(self, requset, *args, **kwargs):
+        count = Article.objects.filter(author=self.request.user).count()
+        return Response(data={'count': count})
+
+    @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated], url_name='my-articles-ids',
+            url_path='my/ids')
+    def my_ids(self, request, *args, **kwargs):
+        ids = Article.objects.filter(author=self.request.user).values_list('id', flat=True)
+        return Response(data=ids)
 
     @action(methods=['GET'], detail=False)
     def recent(self, request, *args, **kwargs):
