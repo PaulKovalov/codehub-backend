@@ -55,6 +55,28 @@ class TestArticleCreate(TestCase):
         old_article.save()
         url = reverse('articles-recent')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.json()[0], ListArticleSerializer(recent_article).data)
+
+    def test_my_articles_count(self):
+        article_count = 5
+        mommy.make(Article, published=True, _quantity=article_count, author=self.author)
+        self.client.force_authenticate(self.author)
+        url = reverse('articles-my-articles-count')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['count'], article_count)
+
+    def test_my_articles_ids_list(self):
+        articles_count = 5
+        articles = []
+        for _ in range(articles_count):
+            articles.append(mommy.make(Article, published=True, author=self.author))
+        self.client.force_authenticate(self.author)
+        url = reverse('articles-my-articles-ids')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), articles_count)
+        for article in articles:
+            self.assertTrue(article.id in response.json())
