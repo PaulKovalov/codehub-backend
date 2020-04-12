@@ -6,10 +6,10 @@ from tutorials.models import Tutorial, TutorialArticle
 
 class TutorialAdmin(admin.ModelAdmin):
     readonly_fields = ('id', 'date_created', 'views', 'total_views')
-    list_display = ('id', 'title', 'author', 'views', 'published', 'date_created', 'articles')
+    list_display = ('id', 'title', 'author', 'views', 'published', 'date_created')
     list_filter = ('id', 'author', 'published')
     fieldsets = [
-        ('Tutorial information', {'fields': ['id', 'title', 'text', 'author', 'views', 'total_views', 'published']}),
+        ('Tutorial information', {'fields': ['id', 'title', 'preview', 'author', 'views', 'total_views', 'published']}),
         ('Date information', {'fields': ['date_created']}),
     ]
 

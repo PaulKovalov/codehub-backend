@@ -19,4 +19,4 @@ class TutorialSerializer(serializers.ModelSerializer):
         fields = ('title', 'preview') + read_only_fields
 
     def get_table_of_content(self, instance):
-        return instance.articles.objects.order_by('date_created').values_list('title', 'id')
+        return instance.articles.filter(published=True).order_by('date_created').values_list('title', 'id')
