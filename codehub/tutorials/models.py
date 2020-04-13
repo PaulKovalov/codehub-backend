@@ -19,6 +19,7 @@ class TutorialArticle(models.Model):
     def username(self):
         return self.author.username
 
+
 class Tutorial(models.Model):
     title = models.CharField(max_length=settings.TUTORIAL_TITLE_MAX_LENGTH, blank=False)
     views = models.IntegerField(default=0)

@@ -62,8 +62,14 @@ class TutorialArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
         serializer.save(author=self.request.user, tutorial=tutorial, preview=get_preview(text),
                         estimate_reading_time=get_reading_time(text))
 
-    @action(methods=['GET'], detail=False, permission_classes=[AllowAny])
+    @action(methods=['GET'], detail=False, permission_classes=[AllowAny], url_path='table-of-content')
     def table_of_content(self, request, *args, **kwargs):
         qs = self.get_queryset()
         toc = [{'title': a.title, 'id': a.id} for a in qs]
         return Response(data=toc)
+
+    @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated], url_path='this-tutorial-count')
+    def my_count(self, request, *args, **kwargs):
+        tutorial = get_object_or_404(Tutorial, id=self.kwargs['tutorial_pk'])
+        count = tutorial.articles.all().count()
+        return Response(data={'count': count})
