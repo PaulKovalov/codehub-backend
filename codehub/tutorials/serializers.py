@@ -1,22 +1,38 @@
 from rest_framework import serializers
 
-from tutorials.models import Tutorial
+from common.base_article_serializer import BaseArticleSerializer
+from tutorials.models import Tutorial, TutorialArticle
 
 
-class TutorialPreviewSerializer(serializers.ModelSerializer):
+class TutorialArticleSerializer(BaseArticleSerializer):
     class Meta:
-        model = Tutorial
-        read_only_fields = ('id', 'title', 'preview', 'views', 'author', 'username', 'total_views', 'date_created')
+        model = TutorialArticle
+        read_only_fields = ('date_created', 'views', 'id', 'estimate_reading_time', 'author', 'username', 'tutorial')
+        fields = ('title', 'text', 'published') + read_only_fields
+
+
+class TutorialArticlePreviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TutorialArticle
+        read_only_fields = (
+            'id', 'date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview', 'username',
+            'tutorial')
         fields = read_only_fields
 
 
 class TutorialSerializer(serializers.ModelSerializer):
-    table_of_content = serializers.SerializerMethodField()
+    articles = TutorialArticlePreviewSerializer(many=True)
 
     class Meta:
         model = Tutorial
-        read_only_fields = ('id', 'views', 'author', 'username', 'total_views', 'date_created', 'table_of_content')
+        read_only_fields = ('id', 'views', 'author', 'username', 'total_views', 'date_created', 'articles')
         fields = ('title', 'preview') + read_only_fields
 
-    def get_table_of_content(self, instance):
-        return instance.articles.filter(published=True).order_by('date_created').values_list('title', 'id')
+
+class MyTutorialArticlePreviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TutorialArticle
+        read_only_fields = (
+            'id', 'date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview', 'published',
+            'username', 'published')
+        fields = read_only_fields

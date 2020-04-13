@@ -11,15 +11,16 @@ from rest_framework.response import Response
 
 from articles.models import Article
 from articles.permissions import ArticlePermission
-from articles.serializers import ArticleSerializer, ListArticleSerializer, MyArticlesListSerializer
+from articles.serializers import ArticleSerializer, ArticlePreviewSerializer, MyArticlesPreviewSerializer
 from articles.tools import get_preview, get_reading_time
-from articles.utils import ArticlePaginator
+from articles.utils import DefaultPaginator
+from common.mixins import MyContentListModelMixin
 
 
-class ArticlesViewSet(viewsets.ModelViewSet):
+class ArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
     permission_classes = [ArticlePermission]
     serializer_class = ArticleSerializer
-    pagination_class = ArticlePaginator
+    pagination_class = DefaultPaginator
 
     def get_queryset(self):
         qs = Article.objects.filter(published=True)
@@ -35,19 +36,10 @@ class ArticlesViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action == 'list':
-            return ListArticleSerializer
+            return ArticlePreviewSerializer
         if self.action == 'my':
-            return MyArticlesListSerializer
+            return MyArticlesPreviewSerializer
         return super().get_serializer_class()
-
-    @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated])
-    def my(self, request, *args, **kwargs):
-        page = self.paginate_queryset(self.get_queryset())
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response(serializer.data)
 
     @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated], url_name='my-articles-count',
             url_path='my/count')
@@ -66,4 +58,4 @@ class ArticlesViewSet(viewsets.ModelViewSet):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         qs = self.get_queryset()
         qs = qs.filter(date_created__gt=yesterday).order_by('views')[:5]
-        return Response(ListArticleSerializer(qs, many=True).data)
+        return Response(ArticlePreviewSerializer(qs, many=True).data)

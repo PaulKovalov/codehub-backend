@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import User
 from articles.models import Article
-from articles.serializers import ListArticleSerializer
+from articles.serializers import ArticlePreviewSerializer
 
 
 class TestArticleCreate(TestCase):
@@ -57,7 +57,7 @@ class TestArticleCreate(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0], ListArticleSerializer(recent_article).data)
+        self.assertEqual(response.json()[0], ArticlePreviewSerializer(recent_article).data)
 
     def test_my_articles_count(self):
         article_count = 5
@@ -80,3 +80,23 @@ class TestArticleCreate(TestCase):
         self.assertEqual(len(response.json()), articles_count)
         for article in articles:
             self.assertTrue(article.id in response.json())
+
+    def test_edit_non_published_article(self):
+        article = mommy.make(Article, author=self.author)
+        self.client.force_authenticate(self.author)
+        url = reverse('articles-detail', kwargs={'pk': article.pk})
+        patch_data = {
+            'text': 'new text here' * 5
+        }
+        response = self.client.patch(url, patch_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_edit_published_article(self):
+        article = mommy.make(Article, author=self.author, published=True)
+        self.client.force_authenticate(self.author)
+        url = reverse('articles-detail', kwargs={'pk': article.pk})
+        patch_data = {
+            'text': 'new text here' * 5
+        }
+        response = self.client.patch(url, patch_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

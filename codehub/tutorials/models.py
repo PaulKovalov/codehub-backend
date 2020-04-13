@@ -15,6 +15,9 @@ class TutorialArticle(models.Model):
     tutorial = models.ForeignKey('tutorials.Tutorial', on_delete=models.CASCADE, related_name='articles')
     author = models.ForeignKey(User, related_name='tutorial_articles', on_delete=models.CASCADE)
 
+    @property
+    def username(self):
+        return self.author.username
 
 class Tutorial(models.Model):
     title = models.CharField(max_length=settings.TUTORIAL_TITLE_MAX_LENGTH, blank=False)

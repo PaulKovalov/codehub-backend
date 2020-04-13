@@ -1,11 +1,15 @@
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import SimpleRouter
+from rest_framework_nested.routers import NestedSimpleRouter
 
 from tutorials import views
 
-router = DefaultRouter()
+router = SimpleRouter()
 router.register('tutorials', views.TutorialsViewSet, basename='tutorials')
 
+articles_router = NestedSimpleRouter(router, 'tutorials', lookup='tutorial')
+articles_router.register('articles', views.TutorialArticlesViewSet, basename='tutorial-articles')
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('', include(articles_router.urls))
 ]
