@@ -94,3 +94,10 @@ class TestTutorials(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()['count'], num_of_articles)
+
+    def test_non_published_tutorial_retrieve_by_author(self):
+        url = reverse('tutorials-detail', kwargs={'pk': self.tutorial.id})
+        self.client.force_authenticate(self.author)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), TutorialSerializer(self.tutorial).data)

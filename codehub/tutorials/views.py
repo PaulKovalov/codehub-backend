@@ -21,9 +21,12 @@ class TutorialsViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
 
     def get_queryset(self):
         qs = Tutorial.objects.filter(published=True)
-        if self.request.user.is_authenticated and (self.action == 'my' or self.action == 'my_count'):
-            qs = Tutorial.objects.filter(author=self.request.user)
-        return qs
+        if self.request.user.is_authenticated:
+            if self.action == 'my' or self.action == 'my_count':
+                qs = Tutorial.objects.filter(author=self.request.user)
+            if self.action == 'retrieve':
+                qs = qs | Tutorial.objects.filter(author=self.request.user)
+        return qs.distinct()
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

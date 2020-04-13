@@ -12,7 +12,7 @@ class TutorialArticle(models.Model):
     text = models.TextField(default='article content', max_length=settings.ARTICLE_CONTENT_MAX_LENGTH, db_index=True)
     estimate_reading_time = models.IntegerField(default=1)
     preview = models.TextField()
-    tutorial = models.ForeignKey('tutorials.Tutorial', on_delete=models.CASCADE, related_name='articles')
+    tutorial = models.ForeignKey('tutorials.Tutorial', on_delete=models.CASCADE, related_name='articles', null=True)
     author = models.ForeignKey(User, related_name='tutorial_articles', on_delete=models.CASCADE)
 
     @property
@@ -34,6 +34,10 @@ class Tutorial(models.Model):
         for article in self.articles.all():
             count += article.views
         return count
+
+    @property
+    def total_articles(self):
+        return self.articles.all().count()
 
     @property
     def username(self):

@@ -27,6 +27,8 @@ class ArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
         if self.request.user.is_authenticated:
             if self.action == 'my' or self.action == 'partial_update':
                 return Article.objects.filter(author=self.request.user)
+            if self.action == 'retrieve':
+                qs = qs | Article.objects.filter(author=self.request.user)
         return qs
 
     def perform_create(self, serializer):
