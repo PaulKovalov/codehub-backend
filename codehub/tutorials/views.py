@@ -81,7 +81,7 @@ class TutorialArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
         tutorial = get_object_or_404(Tutorial, id=self.kwargs['tutorial_pk'])
         text = serializer.validated_data['text']
         last_article_order = -1
-        if tutorial.articles:
+        if tutorial.articles and tutorial.articles.order_by('order').last():
             last_article_order = tutorial.articles.order_by('order').last().order
         serializer.save(author=self.request.user, tutorial=tutorial, preview=get_preview(text),
                         estimate_reading_time=get_reading_time(text), order=last_article_order + 1)
