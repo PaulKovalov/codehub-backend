@@ -9,6 +9,7 @@ from articles.tools import get_preview, get_reading_time
 from articles.utils import DefaultPaginator
 from common.mixins import MyContentListModelMixin
 from tutorials.models import Tutorial, TutorialArticle
+from tutorials.paginators import TutorialArticlesPaginator
 from tutorials.permissions import TutorialPermission, TutorialArticlePermission
 from tutorials.serializers import TutorialSerializer, TutorialArticleSerializer, TutorialArticlePreviewSerializer, \
     MyTutorialArticlePreviewSerializer, MyTutorialSerializer
@@ -49,10 +50,11 @@ class TutorialsViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
         ids = Tutorial.objects.filter(author=self.request.user).values_list('id', flat=True)
         return Response(data=ids)
 
+
 class TutorialArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
     permission_classes = [TutorialArticlePermission]
     serializer_class = TutorialArticleSerializer
-    pagination_class = DefaultPaginator
+    pagination_class = TutorialArticlesPaginator
 
     def get_queryset(self):
         tutorial_pk = self.kwargs['tutorial_pk']
@@ -70,20 +72,20 @@ class TutorialArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
             return MyTutorialArticlePreviewSerializer
         return super().get_serializer_class()
 
+    def get_serializer_context(self, *args, **kwargs):
+        context = super().get_serializer_context(*args, **kwargs)
+        context['tutorial'] = get_object_or_404(Tutorial, id=self.kwargs['tutorial_pk'])
+        return context
+
     def perform_create(self, serializer):
         tutorial = get_object_or_404(Tutorial, id=self.kwargs['tutorial_pk'])
         text = serializer.validated_data['text']
+        last_article_order = tutorial.articles.order_by('order').last().order
         serializer.save(author=self.request.user, tutorial=tutorial, preview=get_preview(text),
-                        estimate_reading_time=get_reading_time(text))
+                        estimate_reading_time=get_reading_time(text), order=last_article_order + 1)
 
     @action(methods=['GET'], detail=False, permission_classes=[AllowAny], url_path='table-of-content')
     def table_of_content(self, request, *args, **kwargs):
         qs = self.get_queryset()
-        toc = [{'title': a.title, 'id': a.id} for a in qs]
+        toc = [{'title': a.title, 'id': a.id} for a in qs.order_by('order')]
         return Response(data=toc)
-
-    @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated], url_path='this-tutorial-count')
-    def my_count(self, request, *args, **kwargs):
-        tutorial = get_object_or_404(Tutorial, id=self.kwargs['tutorial_pk'])
-        count = tutorial.articles.all().count()
-        return Response(data={'count': count})

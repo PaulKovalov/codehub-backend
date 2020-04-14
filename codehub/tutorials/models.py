@@ -14,6 +14,7 @@ class TutorialArticle(models.Model):
     preview = models.TextField()
     tutorial = models.ForeignKey('tutorials.Tutorial', on_delete=models.CASCADE, related_name='articles', null=True)
     author = models.ForeignKey(User, related_name='tutorial_articles', on_delete=models.CASCADE)
+    order = models.PositiveIntegerField(default=0)
 
     @property
     def username(self):

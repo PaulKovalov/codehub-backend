@@ -86,15 +86,6 @@ class TestTutorials(TestCase):
         self.assertTrue(TutorialSerializer(another_tutorial).data not in response.json()['results'])
         self.assertTrue(TutorialSerializer(self.tutorial).data in response.json()['results'])
 
-    def test_articles_count(self):
-        num_of_articles = 5
-        self.client.force_authenticate(self.author)
-        mommy.make(TutorialArticle, tutorial=self.tutorial, author=self.author, _quantity=num_of_articles)
-        url = reverse('tutorial-articles-my-count', kwargs={'tutorial_pk': self.tutorial.pk})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json()['count'], num_of_articles)
-
     def test_non_published_tutorial_retrieve_by_author(self):
         url = reverse('tutorials-detail', kwargs={'pk': self.tutorial.id})
         self.client.force_authenticate(self.author)
