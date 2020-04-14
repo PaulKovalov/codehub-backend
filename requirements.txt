@@ -14,6 +14,7 @@ Django==2.2.8
 django-allauth==0.40.0
 django-cors-headers==3.2.0
 djangorestframework==3.10.3
+drf-nested-routers==0.91
 hyperlink==19.0.0
 idna==2.8
 incremental==17.5.0
