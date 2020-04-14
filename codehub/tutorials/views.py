@@ -11,7 +11,7 @@ from common.mixins import MyContentListModelMixin
 from tutorials.models import Tutorial, TutorialArticle
 from tutorials.permissions import TutorialPermission, TutorialArticlePermission
 from tutorials.serializers import TutorialSerializer, TutorialArticleSerializer, TutorialArticlePreviewSerializer, \
-    MyTutorialArticlePreviewSerializer
+    MyTutorialArticlePreviewSerializer, MyTutorialSerializer
 
 
 class TutorialsViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
@@ -28,6 +28,12 @@ class TutorialsViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
                 qs = qs | Tutorial.objects.filter(author=self.request.user)
         return qs.distinct()
 
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            if self.action == 'my':
+                return MyTutorialSerializer
+        return super().get_serializer_class()
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
@@ -37,6 +43,11 @@ class TutorialsViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
         count = self.get_queryset().count()
         return Response(data={'count': count})
 
+    @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated], url_name='my-tutorials-ids',
+            url_path='my/ids')
+    def my_ids(self, request, *args, **kwargs):
+        ids = Tutorial.objects.filter(author=self.request.user).values_list('id', flat=True)
+        return Response(data=ids)
 
 class TutorialArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
     permission_classes = [TutorialArticlePermission]
