@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from articles.tools import get_preview, get_reading_time
 from articles.utils import DefaultPaginator
-from common.mixins import MyContentListModelMixin
+from common.mixins import MyContentListMixin, RecentContentListMixin
 from tutorials.models import Tutorial, TutorialArticle
 from tutorials.paginators import TutorialArticlesPaginator
 from tutorials.permissions import TutorialPermission, TutorialArticlePermission
@@ -15,7 +15,7 @@ from tutorials.serializers import TutorialSerializer, TutorialArticleSerializer,
     MyTutorialArticlePreviewSerializer, MyTutorialSerializer
 
 
-class TutorialsViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
+class TutorialsViewSet(viewsets.ModelViewSet, MyContentListMixin, RecentContentListMixin):
     permission_classes = [TutorialPermission]
     serializer_class = TutorialSerializer
     pagination_class = DefaultPaginator
@@ -51,7 +51,7 @@ class TutorialsViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
         return Response(data=ids)
 
 
-class TutorialArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
+class TutorialArticlesViewSet(viewsets.ModelViewSet):
     permission_classes = [TutorialArticlePermission]
     serializer_class = TutorialArticleSerializer
     pagination_class = TutorialArticlesPaginator

@@ -2,7 +2,6 @@
 Codehub Article API endpoints
 Pavlo Kovalov 2019
 """
-import datetime
 
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -14,10 +13,10 @@ from articles.permissions import ArticlePermission
 from articles.serializers import ArticleSerializer, ArticlePreviewSerializer, MyArticlesPreviewSerializer
 from articles.tools import get_preview, get_reading_time
 from articles.utils import DefaultPaginator
-from common.mixins import MyContentListModelMixin
+from common.mixins import MyContentListMixin, RecentContentListMixin
 
 
-class ArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
+class ArticlesViewSet(viewsets.ModelViewSet, MyContentListMixin, RecentContentListMixin):
     permission_classes = [ArticlePermission]
     serializer_class = ArticleSerializer
     pagination_class = DefaultPaginator
@@ -37,7 +36,7 @@ class ArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
                         estimate_reading_time=get_reading_time(text))
 
     def get_serializer_class(self, *args, **kwargs):
-        if self.action == 'list':
+        if self.action == 'list' or self.action == 'recent':
             return ArticlePreviewSerializer
         if self.action == 'my':
             return MyArticlesPreviewSerializer
@@ -54,10 +53,3 @@ class ArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
     def my_ids(self, request, *args, **kwargs):
         ids = Article.objects.filter(author=self.request.user).values_list('id', flat=True)
         return Response(data=ids)
-
-    @action(methods=['GET'], detail=False)
-    def recent(self, request, *args, **kwargs):
-        yesterday = datetime.date.today() - datetime.timedelta(days=1)
-        qs = self.get_queryset()
-        qs = qs.filter(date_created__gt=yesterday).order_by('views')[:5]
-        return Response(ArticlePreviewSerializer(qs, many=True).data)

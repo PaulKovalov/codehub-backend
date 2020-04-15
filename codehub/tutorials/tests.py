@@ -60,6 +60,15 @@ class TestTutorials(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), TutorialSerializer(self.tutorial).data)
 
+    def test_recent_tutorials(self):
+        num_of_tutorials = 5
+        tutorials = mommy.make(Tutorial, _quantity=num_of_tutorials, published=True)
+        url = reverse('tutorials-recent')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for tutorial in tutorials:
+            self.assertTrue(TutorialSerializer(tutorial).data in response.json())
+
 
 class TestTutorialArticles(TestCase):
     def setUp(self) -> None:

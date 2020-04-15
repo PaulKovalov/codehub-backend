@@ -1,6 +1,3 @@
-import datetime
-
-import pytz
 from django.test import TestCase
 from django.urls import reverse
 from model_mommy import mommy
@@ -51,10 +48,6 @@ class TestArticleCreate(TestCase):
 
     def test_recent_articles(self):
         recent_article = mommy.make(Article, published=True)
-        old_article = mommy.make(Article, published=True)
-        old_article.date_created = datetime.datetime.combine((datetime.date.today() - datetime.timedelta(days=2)),
-                                                             datetime.datetime.min.time(), tzinfo=pytz.UTC)
-        old_article.save(update_fields=['date_created'])
         url = reverse('articles-recent')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

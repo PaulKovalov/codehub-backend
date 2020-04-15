@@ -36,3 +36,4 @@ class BaseArticleSerializer(serializers.ModelSerializer):
         instance.published = False
         instance.save()
         return instance
+
