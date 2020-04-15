@@ -3,7 +3,7 @@ Codehub Article API endpoints
 Pavlo Kovalov 2019
 """
 
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -13,10 +13,11 @@ from articles.permissions import ArticlePermission
 from articles.serializers import ArticleSerializer, ArticlePreviewSerializer, MyArticlesPreviewSerializer
 from articles.tools import get_preview, get_reading_time
 from articles.utils import DefaultPaginator
-from common.mixins import MyContentListMixin, RecentContentListMixin
+from common.mixins import MyContentListMixin, RecentContentListMixin, CustomRetrieveMixin
 
 
-class ArticlesViewSet(viewsets.ModelViewSet, MyContentListMixin, RecentContentListMixin):
+class ArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
+                      mixins.ListModelMixin, viewsets.GenericViewSet, MyContentListMixin, RecentContentListMixin):
     permission_classes = [ArticlePermission]
     serializer_class = ArticleSerializer
     pagination_class = DefaultPaginator

@@ -19,3 +19,14 @@ class RecentContentListMixin:
     def recent(self, request, *args, **kwargs):
         qs = self.get_queryset().order_by('date_created')[:5]
         return Response(self.get_serializer(qs, many=True).data)
+
+
+class CustomRetrieveMixin:
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        if instance.published:
+            views = instance.views
+            instance.views = views + 1
+            instance.save()
+        return Response(serializer.data)

@@ -32,6 +32,14 @@ class TestTutorials(TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_tutorial_retrieve(self):
+        tutorial = mommy.make(Tutorial, published=True, views=10)
+        url = reverse('tutorials-detail', kwargs={'pk': tutorial.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['id'], tutorial.id)
+        self.assertEqual(Tutorial.objects.get(id=tutorial.id).views, 11)
+
     def test_tutorial_edit(self):
         self.client.force_authenticate(self.author)
         url = reverse('tutorials-detail', kwargs={'pk': self.tutorial.id})
@@ -89,11 +97,13 @@ class TestTutorialArticles(TestCase):
         self.assertTrue(TutorialArticle.objects.filter(id=response.json()['id']))
 
     def test_tutorial_article_retrieve(self):
-        tutorial_article = mommy.make(TutorialArticle, author=self.author, published=True, tutorial=self.tutorial)
+        tutorial_article = mommy.make(TutorialArticle, author=self.author, published=True, tutorial=self.tutorial,
+                                      views=10)
         url = reverse('tutorial-articles-detail', kwargs={'tutorial_pk': self.tutorial.pk, 'pk': tutorial_article.pk})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue('id' in response.json())
+        self.assertEqual(tutorial_article.id, response.json()['id'])
+        self.assertEqual(TutorialArticle.objects.get(id=tutorial_article.id).views, 11)
 
     def test_tutorial_articles_list(self):
         tutorial_article = mommy.make(TutorialArticle, author=self.author, published=True, tutorial=self.tutorial)

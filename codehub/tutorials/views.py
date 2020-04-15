@@ -1,13 +1,13 @@
 # Create your views here.
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from articles.tools import get_preview, get_reading_time
 from articles.utils import DefaultPaginator
-from common.mixins import MyContentListMixin, RecentContentListMixin
+from common.mixins import MyContentListMixin, RecentContentListMixin, CustomRetrieveMixin
 from tutorials.models import Tutorial, TutorialArticle
 from tutorials.paginators import TutorialArticlesPaginator
 from tutorials.permissions import TutorialPermission, TutorialArticlePermission
@@ -15,7 +15,9 @@ from tutorials.serializers import TutorialSerializer, TutorialArticleSerializer,
     MyTutorialArticlePreviewSerializer, MyTutorialSerializer
 
 
-class TutorialsViewSet(viewsets.ModelViewSet, MyContentListMixin, RecentContentListMixin):
+class TutorialsViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
+                       mixins.ListModelMixin, viewsets.GenericViewSet, MyContentListMixin, RecentContentListMixin,
+                       CustomRetrieveMixin):
     permission_classes = [TutorialPermission]
     serializer_class = TutorialSerializer
     pagination_class = DefaultPaginator
@@ -51,7 +53,8 @@ class TutorialsViewSet(viewsets.ModelViewSet, MyContentListMixin, RecentContentL
         return Response(data=ids)
 
 
-class TutorialArticlesViewSet(viewsets.ModelViewSet):
+class TutorialArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixins.UpdateModelMixin,
+                              mixins.DestroyModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [TutorialArticlePermission]
     serializer_class = TutorialArticleSerializer
     pagination_class = TutorialArticlesPaginator

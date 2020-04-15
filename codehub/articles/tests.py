@@ -46,6 +46,14 @@ class TestArticleCreate(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()['results']), article_count)
 
+    def test_article_retrieve(self):
+        article = mommy.make(Article, published=True, views=10)
+        url = reverse('articles-detail', kwargs={'pk': article.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(article.id, response.json()['id'])
+        self.assertEqual(Article.objects.get(id=article.id).views, 11)
+
     def test_recent_articles(self):
         recent_article = mommy.make(Article, published=True)
         url = reverse('articles-recent')
