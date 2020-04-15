@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers
 
 from common.base_article_serializer import BaseArticleSerializer
@@ -10,7 +11,7 @@ class TutorialArticleSerializer(BaseArticleSerializer):
     class Meta:
         model = TutorialArticle
         read_only_fields = ('date_created', 'views', 'id', 'estimate_reading_time', 'author', 'username', 'tutorial')
-        fields = ('title', 'text', 'published', 'nav') + read_only_fields
+        fields = ('title', 'text', 'published', 'nav', 'last_modified') + read_only_fields
 
     def get_nav(self, instance):
         tutorial = self.context.get('tutorial')
@@ -48,13 +49,18 @@ class TutorialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tutorial
         read_only_fields = ('id', 'views', 'author', 'username', 'total_views', 'date_created',
-                            'total_articles')
+                            'total_articles', 'last_modified')
         fields = ('title', 'preview') + read_only_fields
+
+    def update(self, instance, validated_data):
+        if validated_data.get('title') or validated_data.get('preview'):
+            instance.last_modified = timezone.now()
+        return super().update(instance, validated_data)
 
 
 class MyTutorialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tutorial
         read_only_fields = ('id', 'views', 'author', 'username', 'total_views', 'date_created',
-                            'total_articles', 'published')
+                            'total_articles', 'published', 'last_modified')
         fields = ('title', 'preview') + read_only_fields

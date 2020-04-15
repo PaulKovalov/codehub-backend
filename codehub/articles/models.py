@@ -17,6 +17,7 @@ class Article(models.Model):
     text = models.TextField(default='article content', max_length=settings.ARTICLE_CONTENT_MAX_LENGTH, db_index=True)
     estimate_reading_time = models.IntegerField(default=1)
     preview = models.TextField()
+    last_modified = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.title

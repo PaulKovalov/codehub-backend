@@ -1,6 +1,9 @@
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
+
+from tutorials.models import TutorialArticle
 
 
 class BaseArticleSerializer(serializers.ModelSerializer):
@@ -31,8 +34,16 @@ class BaseArticleSerializer(serializers.ModelSerializer):
                 raise PermissionDenied('This field can be edited only by superuser')
         if new_text:
             instance.text = new_text
+            instance.last_modified = timezone.now()
+            if isinstance(instance, TutorialArticle):
+                instance.tutorial.last_modified = timezone.now()
+                instance.tutorial.save()
         if new_title:
             instance.title = new_title
+            instance.last_modified = timezone.now()
+            if isinstance(instance, TutorialArticle):
+                instance.tutorial.last_modified = timezone.now()
+                instance.tutorial.save()
         instance.published = False
         instance.save()
         return instance

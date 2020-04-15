@@ -15,6 +15,7 @@ class TutorialArticle(models.Model):
     tutorial = models.ForeignKey('tutorials.Tutorial', on_delete=models.CASCADE, related_name='articles', null=True)
     author = models.ForeignKey(User, related_name='tutorial_articles', on_delete=models.CASCADE)
     order = models.PositiveIntegerField(default=0)
+    last_modified = models.DateTimeField(blank=True, null=True)
 
     @property
     def username(self):
@@ -28,6 +29,7 @@ class Tutorial(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tutorials')
     date_created = models.DateTimeField(auto_now_add=True)
     preview = models.TextField(max_length=settings.TUTORIAL_PREVIEW_MAX_LENGTH, blank=True, null=True)
+    last_modified = models.DateTimeField(blank=True, null=True)
 
     @property
     def total_views(self):

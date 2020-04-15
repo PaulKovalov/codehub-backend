@@ -12,7 +12,8 @@ from common.base_article_serializer import BaseArticleSerializer
 class ArticleSerializer(BaseArticleSerializer):
     class Meta:
         model = Article
-        read_only_fields = ('date_created', 'views', 'id', 'estimate_reading_time', 'author', 'username')
+        read_only_fields = ('date_created', 'views', 'id', 'estimate_reading_time', 'author', 'username',
+                            'last_modified')
         fields = ('title', 'text', 'published') + read_only_fields
 
 
