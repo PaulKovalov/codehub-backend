@@ -23,7 +23,7 @@ class TutorialsViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
     def get_queryset(self):
         qs = Tutorial.objects.filter(published=True)
         if self.request.user.is_authenticated:
-            if self.action == 'my' or self.action == 'my_count':
+            if self.action == 'my' or self.action == 'my_count' or self.action == 'partial_update':
                 qs = Tutorial.objects.filter(author=self.request.user)
             if self.action == 'retrieve':
                 qs = qs | Tutorial.objects.filter(author=self.request.user)
@@ -73,15 +73,15 @@ class TutorialArticlesViewSet(viewsets.ModelViewSet, MyContentListModelMixin):
         return super().get_serializer_class()
 
     def get_serializer_context(self, *args, **kwargs):
-        context = super().get_serializer_context(*args, **kwargs)
-        context['tutorial'] = get_object_or_404(Tutorial, id=self.kwargs['tutorial_pk'])
+        context = super().get_serializer_context()
+        context.update({'tutorial': Tutorial.objects.get(id=self.kwargs['tutorial_pk'])})
         return context
 
     def perform_create(self, serializer):
         tutorial = get_object_or_404(Tutorial, id=self.kwargs['tutorial_pk'])
         text = serializer.validated_data['text']
         last_article_order = -1
-        if tutorial.articles and tutorial.articles.order_by('order').last():
+        if tutorial.articles.all().count():
             last_article_order = tutorial.articles.order_by('order').last().order
         serializer.save(author=self.request.user, tutorial=tutorial, preview=get_preview(text),
                         estimate_reading_time=get_reading_time(text), order=last_article_order + 1)

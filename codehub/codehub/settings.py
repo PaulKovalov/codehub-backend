@@ -102,8 +102,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
-
 # custom variables go here
 ARTICLE_TITLE_MIN_LENGTH = 8
 ARTICLE_TITLE_MAX_LENGTH = 128
