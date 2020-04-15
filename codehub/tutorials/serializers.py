@@ -15,8 +15,8 @@ class TutorialArticleSerializer(BaseArticleSerializer):
 
     def get_nav(self, instance):
         tutorial = self.context.get('tutorial')
-        qs = tutorial.articles.order_by('order')
-        if self.context.get('request').user.is_authenticated:
+        qs = tutorial.articles.all()
+        if self.context.get('request').user.is_authenticated and tutorial.author == self.context.get('request').user:
             next_article = qs.filter(order__gt=instance.order).first()
             prev_article = qs.filter(order__lt=instance.order).last()
         else:
