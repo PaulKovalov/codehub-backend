@@ -2,6 +2,7 @@
 codehub URL Configuration
 Pavlo Kovalov 2019
 """
+
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import path, include
@@ -14,7 +15,8 @@ api_urls = [
     path('', include('articles.urls')),
     path('', include('accounts.urls')),
     path('', include('home.urls')),
-    path('', include('tutorials.urls'))
+    path('', include('tutorials.urls')),
+    path('', include('content.urls'))
 ]
 
 urlpatterns = [

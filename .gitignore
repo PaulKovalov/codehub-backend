@@ -80,3 +80,4 @@ ENV/
 /docker-compose.yml
 
 /testing/test_results/
+/image-uploads/

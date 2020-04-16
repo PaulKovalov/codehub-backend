@@ -13,6 +13,7 @@ defusedxml==0.6.0
 Django==2.2.8
 django-allauth==0.40.0
 django-cors-headers==3.2.0
+django-storages==1.9.1
 djangorestframework==3.10.3
 drf-nested-routers==0.91
 hyperlink==19.0.0
