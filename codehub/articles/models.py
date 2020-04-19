@@ -35,4 +35,5 @@ class ArticleComment(models.Model):
 
     @property
     def username(self):
-        return self.author.username
+        if self.author:
+            return self.author.username
