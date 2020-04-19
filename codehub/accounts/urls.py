@@ -1,8 +1,3 @@
-"""
-Codehub Accounts API urls
-Pavlo Kovalov 2019
-"""
-
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 

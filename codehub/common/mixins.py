@@ -30,3 +30,19 @@ class CustomRetrieveMixin:
             instance.views = views + 1
             instance.save()
         return Response(serializer.data)
+
+
+class ReactModelMixin:
+    @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
+    def like(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.likes = instance.likes + 1
+        instance.save(update_fields=['likes'])
+        return Response()
+
+    @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
+    def dislike(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.dislikes = instance.dislikes + 1
+        instance.save(update_fields=['dislikes'])
+        return Response()

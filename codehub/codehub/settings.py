@@ -1,8 +1,3 @@
-"""
-Django settings for codehub project.
-Pavlo Kovalov 2019
-"""
-
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -114,6 +109,7 @@ ARTICLE_CONTENT_MIN_LENGTH = 64
 TUTORIAL_TITLE_MIN_LENGTH = 8
 TUTORIAL_TITLE_MAX_LENGTH = 128
 TUTORIAL_PREVIEW_MAX_LENGTH = 1024
+COMMENT_MAX_LENGTH = 4096
 
 # asgi setup
 ASGI_APPLICATION = 'codehub.routing.application'

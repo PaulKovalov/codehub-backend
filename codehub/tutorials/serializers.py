@@ -1,7 +1,7 @@
 from django.utils import timezone
 from rest_framework import serializers
 
-from common.base_article_serializer import BaseArticleSerializer
+from common.serializers import BaseArticleSerializer
 from tutorials.models import Tutorial, TutorialArticle
 
 
@@ -14,7 +14,7 @@ class TutorialArticleSerializer(BaseArticleSerializer):
         fields = ('title', 'text', 'published', 'nav', 'last_modified') + read_only_fields
 
     def get_nav(self, instance):
-        tutorial = self.context.get('tutorial')
+        tutorial = instance.tutorial
         qs = tutorial.articles.all()
         if self.context.get('request').user.is_authenticated and tutorial.author == self.context.get('request').user:
             next_article = qs.filter(order__gt=instance.order).first()

@@ -1,7 +1,3 @@
-"""
-CodeHub accounts view
-Pavlo Kovalov 2019
-"""
 from django.contrib.auth import login, logout
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action

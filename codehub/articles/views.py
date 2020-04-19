@@ -1,19 +1,16 @@
-"""
-Codehub Article API endpoints
-Pavlo Kovalov 2019
-"""
-
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from articles.models import Article
 from articles.permissions import ArticlePermission
-from articles.serializers import ArticleSerializer, ArticlePreviewSerializer, MyArticlesPreviewSerializer
+from articles.serializers import ArticleSerializer, ArticlePreviewSerializer, MyArticlesPreviewSerializer, \
+    ArticleCommentSerializer
 from articles.tools import get_preview, get_reading_time
 from articles.utils import DefaultPaginator
-from common.mixins import MyContentListMixin, RecentContentListMixin, CustomRetrieveMixin
+from common.mixins import MyContentListMixin, RecentContentListMixin, CustomRetrieveMixin, ReactModelMixin
 
 
 class ArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
@@ -54,3 +51,23 @@ class ArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixins.Updat
     def my_ids(self, request, *args, **kwargs):
         ids = Article.objects.filter(author=self.request.user).values_list('id', flat=True)
         return Response(data=ids)
+
+
+class ArticleCommentsViewSet(viewsets.ModelViewSet, ReactModelMixin):
+    serializer_class = ArticleCommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = DefaultPaginator
+
+    def perform_create(self, serializer):
+        author = self.request.user
+        article = get_object_or_404(Article, id=self.kwargs['article_pk'], published=True)
+        serializer.save(author=author, article=article)
+
+    def get_queryset(self):
+        article = get_object_or_404(Article, id=self.kwargs['article_pk'], published=True)
+        return article.comments.all()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({'article': get_object_or_404(Article, id=self.kwargs['article_pk'], published=True)})
+        return context

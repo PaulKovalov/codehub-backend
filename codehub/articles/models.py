@@ -1,7 +1,3 @@
-"""
-Codehub Article app models
-Pavlo Kovalov 2019
-"""
 from django.conf import settings
 from django.db import models
 
@@ -21,6 +17,21 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def username(self):
+        return self.author.username
+
+
+class ArticleComment(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='article_comments')
+    date_created = models.DateTimeField(auto_now_add=True)
+    text = models.TextField()
+    likes = models.PositiveIntegerField(default=0)
+    dislikes = models.PositiveIntegerField(default=0)
+    reply_to = models.ForeignKey('articles.ArticleComment', null=True, on_delete=models.CASCADE, related_name='replies')
+    edited = models.BooleanField(default=False)
 
     @property
     def username(self):

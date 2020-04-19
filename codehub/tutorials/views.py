@@ -75,11 +75,6 @@ class TutorialArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixi
             return MyTutorialArticlePreviewSerializer
         return super().get_serializer_class()
 
-    def get_serializer_context(self, *args, **kwargs):
-        context = super().get_serializer_context()
-        context.update({'tutorial': Tutorial.objects.get(id=self.kwargs['tutorial_pk'])})
-        return context
-
     def perform_create(self, serializer):
         tutorial = get_object_or_404(Tutorial, id=self.kwargs['tutorial_pk'])
         text = serializer.validated_data['text']
