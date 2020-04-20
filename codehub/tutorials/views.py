@@ -2,17 +2,17 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from articles.tools import get_preview, get_reading_time
 from articles.utils import DefaultPaginator
-from common.mixins import MyContentListMixin, RecentContentListMixin, CustomRetrieveMixin
-from tutorials.models import Tutorial, TutorialArticle
+from common.mixins import MyContentListMixin, RecentContentListMixin, CustomRetrieveMixin, ReactModelMixin
+from tutorials.models import Tutorial, TutorialArticle, TutorialArticleCommentReaction
 from tutorials.paginators import TutorialArticlesPaginator
 from tutorials.permissions import TutorialPermission, TutorialArticlePermission
 from tutorials.serializers import TutorialSerializer, TutorialArticleSerializer, TutorialArticlePreviewSerializer, \
-    MyTutorialArticlePreviewSerializer, MyTutorialSerializer
+    MyTutorialArticlePreviewSerializer, MyTutorialSerializer, TutorialArticleCommentSerializer
 
 
 class TutorialsViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
@@ -89,3 +89,22 @@ class TutorialArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixi
         qs = self.get_queryset()
         toc = [{'title': a.title, 'id': a.id} for a in qs.order_by('order')]
         return Response(data=toc)
+
+
+class TutorialArticleCommentsViewSet(viewsets.ModelViewSet, ReactModelMixin):
+    serializer_class = TutorialArticleCommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = DefaultPaginator
+
+    @staticmethod
+    def get_reaction_model():
+        return TutorialArticleCommentReaction
+
+    def perform_create(self, serializer):
+        author = self.request.user
+        article = get_object_or_404(TutorialArticle, id=self.kwargs['article_pk'], published=True)
+        serializer.save(author=author, article=article)
+
+    def get_queryset(self):
+        article = get_object_or_404(TutorialArticle, id=self.kwargs['article_pk'], published=True)
+        return article.comments.all()

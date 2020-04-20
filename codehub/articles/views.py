@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from articles.models import Article
+from articles.models import Article, CommentReaction
 from articles.permissions import ArticlePermission
 from articles.serializers import ArticleSerializer, ArticlePreviewSerializer, MyArticlesPreviewSerializer, \
     ArticleCommentSerializer
@@ -58,6 +58,9 @@ class ArticleCommentsViewSet(viewsets.ModelViewSet, ReactModelMixin):
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = DefaultPaginator
 
+    def get_reaction_model(self):
+        return CommentReaction
+
     def perform_create(self, serializer):
         author = self.request.user
         article = get_object_or_404(Article, id=self.kwargs['article_pk'], published=True)
@@ -66,8 +69,3 @@ class ArticleCommentsViewSet(viewsets.ModelViewSet, ReactModelMixin):
     def get_queryset(self):
         article = get_object_or_404(Article, id=self.kwargs['article_pk'], published=True)
         return article.comments.all()
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({'article': get_object_or_404(Article, id=self.kwargs['article_pk'], published=True)})
-        return context

@@ -36,13 +36,28 @@ class ReactModelMixin:
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
     def like(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.likes = instance.likes + 1
-        instance.save(update_fields=['likes'])
-        return Response()
+        reaction_model = self.get_reaction_model()
+        if reaction_model.objects.filter(comment=instance, user=self.request.user, type='like'):
+            reaction_model.objects.get(comment=instance, user=self.request.user, type='like').delete()
+            return Response(data='dec')
+        else:
+            obj, created = reaction_model.objects.update_or_create(comment=instance, user=self.request.user,
+                                                                   defaults={'type': 'like'})
+            if created:
+                return Response(data='inc')
+            else:
+                return Response(data='swap')
 
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
     def dislike(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.dislikes = instance.dislikes + 1
-        instance.save(update_fields=['dislikes'])
-        return Response()
+        reaction_model = self.get_reaction_model()
+        if reaction_model.objects.filter(comment=instance, user=self.request.user, type='dislike'):
+            reaction_model.objects.get(comment=instance, user=self.request.user, type='dislike').delete()
+            return Response(data='dec')
+        obj, created = reaction_model.objects.update_or_create(comment=instance, user=self.request.user,
+                                                               defaults={'type': 'dislike'})
+        if created:
+            return Response(data='inc')
+        else:
+            return Response(data='swap')

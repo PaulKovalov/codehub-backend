@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.utils import timezone
 from rest_framework import serializers
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from tutorials.models import TutorialArticle
 
@@ -47,3 +47,29 @@ class BaseArticleSerializer(serializers.ModelSerializer):
         instance.published = False
         instance.save()
         return instance
+
+
+class BaseCommentSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField(read_only=True)
+    likes = serializers.SerializerMethodField(read_only=True)
+    dislikes = serializers.SerializerMethodField(read_only=True)
+
+    def get_replies(self, instance):
+        qs = instance.article.comments.filter(reply_to=instance)
+        return [c.id for c in qs]
+
+    def validate_text(self, text):
+        if text:
+            if len(text) > settings.COMMENT_MAX_LENGTH:
+                raise ValidationError('\'text\' is too long!')
+            if len(text) == 0:
+                raise ValidationError('\'text\' is empty')
+        else:
+            raise ValidationError('\'text\' is None')
+        return text
+
+    def get_likes(self, instance):
+        return instance.reactions.all().filter(type='like').count()
+
+    def get_dislikes(self, instance):
+        return instance.reactions.all().filter(type='dislike').count()

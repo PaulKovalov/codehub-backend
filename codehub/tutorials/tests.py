@@ -6,9 +6,9 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import User
-from tutorials.models import Tutorial, TutorialArticle
+from tutorials.models import Tutorial, TutorialArticle, TutorialArticleComment, TutorialArticleCommentReaction
 from tutorials.serializers import TutorialArticlePreviewSerializer, TutorialSerializer, \
-    MyTutorialSerializer
+    MyTutorialSerializer, TutorialArticleCommentSerializer
 
 
 class TestTutorials(TestCase):
@@ -143,3 +143,93 @@ class TestTutorialArticles(TestCase):
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(TutorialArticle.objects.get(id=response.json()['id']).text, data['text'])
+
+
+class TestArticleComments(TestCase):
+    def setUp(self) -> None:
+        self.author = mommy.make(User)
+        self.random_user = mommy.make(User)
+        self.tutorial = mommy.make(Tutorial, author=self.author, published=True)
+        self.article = mommy.make(TutorialArticle, tutorial=self.tutorial, author=self.author)
+        self.published_article = mommy.make(TutorialArticle, tutorial=self.tutorial, author=self.author, published=True)
+        self.client = APIClient()
+
+    def test_comment_create(self):
+        self.client.force_authenticate(self.random_user)
+        url = reverse('tutorial_article-comments-list',
+                      kwargs={'tutorial_pk': self.tutorial.pk, 'article_pk': self.published_article.id})
+        data = {
+            'text': 'Some comment text',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(TutorialArticleComment.objects.get(id=response.json()['id']))
+
+    def test_comment_create_non_published_article(self):
+        self.client.force_authenticate(self.random_user)
+        url = reverse('tutorial_article-comments-list',
+                      kwargs={'tutorial_pk': self.tutorial.pk, 'article_pk': self.article.id})
+        data = {
+            'text': 'Some comment text',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_comments_list(self):
+        num_of_comments = 6
+        comments = mommy.make(TutorialArticleComment, _quantity=num_of_comments, author=self.random_user,
+                              article=self.published_article)
+        url = reverse('tutorial_article-comments-list',
+                      kwargs={'tutorial_pk': self.tutorial.pk, 'article_pk': self.published_article.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for comment in comments:
+            self.assertTrue(TutorialArticleCommentSerializer(comment).data in response.json()['results'])
+
+    def test_comments_edit(self):
+        comment = mommy.make(TutorialArticleComment, author=self.random_user, article=self.published_article)
+        self.client.force_authenticate(self.random_user)
+        url = reverse('tutorial_article-comments-detail',
+                      kwargs={'tutorial_pk': self.tutorial.pk, 'article_pk': self.published_article.id,
+                              'pk': comment.pk})
+        data = {
+            'text': 'New text for the comment'
+        }
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(TutorialArticleComment.objects.get(id=comment.id).text, data['text'])
+
+    def test_comment_reply(self):
+        comment = mommy.make(TutorialArticleComment, author=self.random_user, article=self.published_article)
+        self.client.force_authenticate(self.random_user)
+        url = reverse('tutorial_article-comments-list',
+                      kwargs={'tutorial_pk': self.tutorial.pk, 'article_pk': self.published_article.id})
+        data = {
+            'text': 'New text for the comment',
+            'reply_to': comment.id
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            response.json()['id'] in TutorialArticleComment.objects.get(id=comment.id).replies.values_list('id',
+                                                                                                           flat=True))
+
+    def test_comment_reaction_like(self):
+        comment = mommy.make(TutorialArticleComment, author=self.random_user, article=self.published_article)
+        self.client.force_authenticate(self.author)
+        url = reverse('tutorial_article-comments-like',
+                      kwargs={'tutorial_pk': self.tutorial.pk, 'article_pk': self.published_article.id,
+                              'pk': comment.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(TutorialArticleCommentReaction.objects.filter(comment__id=comment.id, type='like'), 1)
+
+    def test_comment_reaction_dislike(self):
+        comment = mommy.make(TutorialArticleComment, author=self.random_user, article=self.published_article)
+        self.client.force_authenticate(self.author)
+        url = reverse('tutorial_article-comments-dislike',
+                      kwargs={'tutorial_pk': self.tutorial.pk, 'article_pk': self.published_article.id,
+                              'pk': comment.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(TutorialArticleCommentReaction.objects.filter(comment__id=comment.id, type='dislike'), 1)

@@ -1,8 +1,8 @@
 from django.utils import timezone
 from rest_framework import serializers
 
-from common.serializers import BaseArticleSerializer
-from tutorials.models import Tutorial, TutorialArticle
+from common.serializers import BaseArticleSerializer, BaseCommentSerializer
+from tutorials.models import Tutorial, TutorialArticle, TutorialArticleComment
 
 
 class TutorialArticleSerializer(BaseArticleSerializer):
@@ -64,3 +64,11 @@ class MyTutorialSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'views', 'author', 'username', 'total_views', 'date_created',
                             'total_articles', 'published', 'last_modified')
         fields = ('title', 'preview') + read_only_fields
+
+
+class TutorialArticleCommentSerializer(BaseCommentSerializer):
+    class Meta:
+        model = TutorialArticleComment
+        read_only_fields = ('id', 'article', 'author', 'username', 'date_created',
+                            'replies', 'likes', 'dislikes', 'edited')
+        fields = read_only_fields + ('text', 'reply_to')

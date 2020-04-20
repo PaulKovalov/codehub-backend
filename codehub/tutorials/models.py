@@ -45,3 +45,34 @@ class Tutorial(models.Model):
     @property
     def username(self):
         return self.author.username
+
+
+class TutorialArticleComment(models.Model):
+    article = models.ForeignKey(TutorialArticle, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='tutorial_articles_comments')
+    date_created = models.DateTimeField(auto_now_add=True)
+    text = models.TextField()
+    reply_to = models.ForeignKey('tutorials.TutorialArticleComment', null=True, on_delete=models.CASCADE,
+                                 related_name='replies')
+    edited = models.BooleanField(default=False)
+
+    @property
+    def username(self):
+        if self.author:
+            return self.author.username
+
+
+class TutorialArticleCommentReaction(models.Model):
+    TYPES = (
+        ('like', 'like'),
+        ('dislike', 'dislike'),
+    )
+
+    comment = models.ForeignKey(TutorialArticleComment, on_delete=models.CASCADE, related_name='reactions')
+    type = models.CharField(choices=TYPES, max_length=8)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['comment', 'user'], name='user_comment')
+        ]

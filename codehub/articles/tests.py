@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import User
-from articles.models import Article, ArticleComment
+from articles.models import Article, ArticleComment, CommentReaction
 from articles.serializers import ArticlePreviewSerializer, ArticleCommentSerializer
 
 
@@ -172,7 +172,7 @@ class TestArticleComments(TestCase):
         url = reverse('article-comments-like', kwargs={'article_pk': self.published_article.id, 'pk': comment.pk})
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(ArticleComment.objects.get(id=comment.id).likes, 1)
+        self.assertTrue(CommentReaction.objects.filter(comment__id=comment.id, type='like'), 1)
 
     def test_comment_reaction_dislike(self):
         comment = mommy.make(ArticleComment, author=self.random_user, article=self.published_article)
@@ -180,4 +180,4 @@ class TestArticleComments(TestCase):
         url = reverse('article-comments-dislike', kwargs={'article_pk': self.published_article.id, 'pk': comment.pk})
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(ArticleComment.objects.get(id=comment.id).dislikes, 1)
+        self.assertTrue(CommentReaction.objects.filter(comment__id=comment.id, type='dislike'), 1)
