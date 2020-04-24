@@ -51,8 +51,14 @@ class BaseArticleSerializer(serializers.ModelSerializer):
 
 class BaseCommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField(read_only=True)
-    likes = serializers.SerializerMethodField(read_only=True)
     dislikes = serializers.SerializerMethodField(read_only=True)
+    likes = serializers.SerializerMethodField(read_only=True)
+
+    def get_likes(self, instance):
+        return instance.reactions.all().filter(type='like').count()
+
+    def get_dislikes(self, instance):
+        return instance.reactions.all().filter(type='dislike').count()
 
     def get_replies(self, instance):
         qs = instance.article.comments.filter(reply_to=instance)
@@ -68,8 +74,4 @@ class BaseCommentSerializer(serializers.ModelSerializer):
             raise ValidationError('\'text\' is None')
         return text
 
-    def get_likes(self, instance):
-        return instance.reactions.all().filter(type='like').count()
 
-    def get_dislikes(self, instance):
-        return instance.reactions.all().filter(type='dislike').count()

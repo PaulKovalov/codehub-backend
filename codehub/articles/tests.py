@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import User
-from articles.models import Article, ArticleComment, CommentReaction
+from articles.models import Article, ArticleComment, CommentReaction, ArticleReaction
 from articles.serializers import ArticlePreviewSerializer, ArticleCommentSerializer
 
 
@@ -103,6 +103,22 @@ class TestArticleCreate(TestCase):
         }
         response = self.client.patch(url, patch_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_like_article(self):
+        article = mommy.make(Article, author=self.author, published=True)
+        self.client.force_authenticate(self.author)
+        url = reverse('articles-like', kwargs={'pk': article.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(ArticleReaction.objects.get(article__id=article.id, type='like'), 1)
+
+    def test_dislike_article(self):
+        article = mommy.make(Article, author=self.author, published=True)
+        self.client.force_authenticate(self.author)
+        url = reverse('articles-dislike', kwargs={'pk': article.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(ArticleReaction.objects.get(article__id=article.id, type='dislike'), 1)
 
 
 class TestArticleComments(TestCase):

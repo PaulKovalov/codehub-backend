@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from articles.tools import get_preview, get_reading_time
 from articles.utils import DefaultPaginator
 from common.mixins import MyContentListMixin, RecentContentListMixin, CustomRetrieveMixin, ReactModelMixin
-from tutorials.models import Tutorial, TutorialArticle, TutorialArticleCommentReaction
+from tutorials.models import Tutorial, TutorialArticle, TutorialArticleCommentReaction, TutorialArticleReaction
 from tutorials.paginators import TutorialArticlesPaginator
 from tutorials.permissions import TutorialPermission, TutorialArticlePermission
 from tutorials.serializers import TutorialSerializer, TutorialArticleSerializer, TutorialArticlePreviewSerializer, \
@@ -54,10 +54,17 @@ class TutorialsViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.
 
 
 class TutorialArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixins.UpdateModelMixin,
-                              mixins.DestroyModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+                              mixins.DestroyModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet,
+                              ReactModelMixin):
     permission_classes = [TutorialArticlePermission]
     serializer_class = TutorialArticleSerializer
     pagination_class = TutorialArticlesPaginator
+
+    def get_reaction_model(self):
+        return TutorialArticleReaction
+
+    def get_reaction_lookup_kwargs(self):
+        return dict(article=self.get_object())
 
     def get_queryset(self):
         tutorial_pk = self.kwargs['tutorial_pk']
@@ -99,6 +106,9 @@ class TutorialArticleCommentsViewSet(viewsets.ModelViewSet, ReactModelMixin):
     @staticmethod
     def get_reaction_model():
         return TutorialArticleCommentReaction
+
+    def get_reaction_lookup_kwargs(self):
+        return dict(comment=self.get_object())
 
     def perform_create(self, serializer):
         author = self.request.user

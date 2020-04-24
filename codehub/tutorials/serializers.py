@@ -7,11 +7,20 @@ from tutorials.models import Tutorial, TutorialArticle, TutorialArticleComment
 
 class TutorialArticleSerializer(BaseArticleSerializer):
     nav = serializers.SerializerMethodField(read_only=True)
+    dislikes = serializers.SerializerMethodField(read_only=True)
+    likes = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = TutorialArticle
-        read_only_fields = ('date_created', 'views', 'id', 'estimate_reading_time', 'author', 'username', 'tutorial')
+        read_only_fields = (
+        'date_created', 'views', 'id', 'estimate_reading_time', 'author', 'username', 'tutorial', 'likes', 'dislikes')
         fields = ('title', 'text', 'published', 'nav', 'last_modified') + read_only_fields
+
+    def get_likes(self, instance):
+        return instance.reactions.all().filter(type='like').count()
+
+    def get_dislikes(self, instance):
+        return instance.reactions.all().filter(type='dislike').count()
 
     def get_nav(self, instance):
         tutorial = instance.tutorial
