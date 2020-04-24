@@ -6,7 +6,8 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import User
-from tutorials.models import Tutorial, TutorialArticle, TutorialArticleComment, TutorialArticleCommentReaction
+from tutorials.models import Tutorial, TutorialArticle, TutorialArticleComment, TutorialArticleCommentReaction, \
+    TutorialArticleReaction
 from tutorials.serializers import TutorialArticlePreviewSerializer, TutorialSerializer, \
     MyTutorialSerializer, TutorialArticleCommentSerializer
 
@@ -143,6 +144,22 @@ class TestTutorialArticles(TestCase):
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(TutorialArticle.objects.get(id=response.json()['id']).text, data['text'])
+
+    def test_like_tutorial_article(self):
+        article = mommy.make(TutorialArticle, author=self.author, published=True, tutorial=self.tutorial)
+        self.client.force_authenticate(self.author)
+        url = reverse('tutorial-articles-like', kwargs={'tutorial_pk': self.tutorial.pk, 'pk': article.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(TutorialArticleReaction.objects.get(article__id=article.id, type='like'), 1)
+
+    def test_dislike_tutorial_article(self):
+        article = mommy.make(TutorialArticle, author=self.author, published=True, tutorial=self.tutorial)
+        self.client.force_authenticate(self.author)
+        url = reverse('tutorial-articles-dislike', kwargs={'tutorial_pk': self.tutorial.pk, 'pk': article.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(TutorialArticleReaction.objects.get(article__id=article.id, type='dislike'), 1)
 
 
 class TestArticleComments(TestCase):

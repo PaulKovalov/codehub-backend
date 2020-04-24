@@ -5,11 +5,20 @@ from common.serializers import BaseArticleSerializer, BaseCommentSerializer
 
 
 class ArticleSerializer(BaseArticleSerializer):
+    dislikes = serializers.SerializerMethodField(read_only=True)
+    likes = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Article
         read_only_fields = ('date_created', 'views', 'id', 'estimate_reading_time', 'author', 'username',
-                            'last_modified')
+                            'last_modified', 'likes', 'dislikes')
         fields = ('title', 'text', 'published') + read_only_fields
+
+    def get_likes(self, instance):
+        return instance.reactions.all().filter(type='like').count()
+
+    def get_dislikes(self, instance):
+        return instance.reactions.all().filter(type='dislike').count()
 
 
 class ArticlePreviewSerializer(serializers.ModelSerializer):

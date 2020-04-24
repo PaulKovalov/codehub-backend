@@ -35,13 +35,13 @@ class CustomRetrieveMixin:
 class ReactModelMixin:
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
     def like(self, request, *args, **kwargs):
-        instance = self.get_object()
+        lookup_kwarg = self.get_reaction_lookup_kwargs()
         reaction_model = self.get_reaction_model()
-        if reaction_model.objects.filter(comment=instance, user=self.request.user, type='like'):
-            reaction_model.objects.get(comment=instance, user=self.request.user, type='like').delete()
+        if reaction_model.objects.filter(**lookup_kwarg, user=self.request.user, type='like'):
+            reaction_model.objects.get(**lookup_kwarg, user=self.request.user, type='like').delete()
             return Response(data='dec')
         else:
-            obj, created = reaction_model.objects.update_or_create(comment=instance, user=self.request.user,
+            obj, created = reaction_model.objects.update_or_create(**lookup_kwarg, user=self.request.user,
                                                                    defaults={'type': 'like'})
             if created:
                 return Response(data='inc')
@@ -50,12 +50,12 @@ class ReactModelMixin:
 
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
     def dislike(self, request, *args, **kwargs):
-        instance = self.get_object()
+        lookup_kwarg = self.get_reaction_lookup_kwargs()
         reaction_model = self.get_reaction_model()
-        if reaction_model.objects.filter(comment=instance, user=self.request.user, type='dislike'):
-            reaction_model.objects.get(comment=instance, user=self.request.user, type='dislike').delete()
+        if reaction_model.objects.filter(**lookup_kwarg, user=self.request.user, type='dislike'):
+            reaction_model.objects.get(**lookup_kwarg, user=self.request.user, type='dislike').delete()
             return Response(data='dec')
-        obj, created = reaction_model.objects.update_or_create(comment=instance, user=self.request.user,
+        obj, created = reaction_model.objects.update_or_create(**lookup_kwarg, user=self.request.user,
                                                                defaults={'type': 'dislike'})
         if created:
             return Response(data='inc')

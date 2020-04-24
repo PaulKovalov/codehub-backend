@@ -74,5 +74,21 @@ class TutorialArticleCommentReaction(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['comment', 'user'], name='user_comment')
+            models.UniqueConstraint(fields=['comment', 'user'], name='user_tutorial_article_comment')
+        ]
+
+
+class TutorialArticleReaction(models.Model):
+    TYPES = (
+        ('like', 'like'),
+        ('dislike', 'dislike'),
+    )
+
+    article = models.ForeignKey(TutorialArticle, on_delete=models.CASCADE, related_name='reactions')
+    type = models.CharField(choices=TYPES, max_length=8)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['article', 'user'], name='user_tutorial_article')
         ]

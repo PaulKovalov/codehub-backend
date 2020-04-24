@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from articles.models import Article, CommentReaction
+from articles.models import Article, CommentReaction, ArticleReaction
 from articles.permissions import ArticlePermission
 from articles.serializers import ArticleSerializer, ArticlePreviewSerializer, MyArticlesPreviewSerializer, \
     ArticleCommentSerializer
@@ -14,7 +14,8 @@ from common.mixins import MyContentListMixin, RecentContentListMixin, CustomRetr
 
 
 class ArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
-                      mixins.ListModelMixin, viewsets.GenericViewSet, MyContentListMixin, RecentContentListMixin):
+                      mixins.ListModelMixin, viewsets.GenericViewSet, MyContentListMixin, RecentContentListMixin,
+                      ReactModelMixin):
     permission_classes = [ArticlePermission]
     serializer_class = ArticleSerializer
     pagination_class = DefaultPaginator
@@ -27,6 +28,12 @@ class ArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixins.Updat
             if self.action == 'retrieve':
                 qs = qs | Article.objects.filter(author=self.request.user)
         return qs
+
+    def get_reaction_model(self):
+        return ArticleReaction
+
+    def get_reaction_lookup_kwargs(self):
+        return dict(article=self.get_object())
 
     def perform_create(self, serializer):
         text = serializer.validated_data['text']
@@ -60,6 +67,9 @@ class ArticleCommentsViewSet(viewsets.ModelViewSet, ReactModelMixin):
 
     def get_reaction_model(self):
         return CommentReaction
+
+    def get_reaction_lookup_kwargs(self):
+        return dict(comment=self.get_object())
 
     def perform_create(self, serializer):
         author = self.request.user
