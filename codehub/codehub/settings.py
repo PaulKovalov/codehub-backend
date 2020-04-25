@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'articles.apps.ArticlesConfig',
     'tutorials.apps.TutorialsConfig',
+    'common.apps.CommonConfig',
     'home.apps.HomeConfig',
     'content.apps.ContentConfig',
     'django.contrib.admin',

@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from accounts.models import User
+from common.models import ReactionBaseModel
 
 
 class Article(models.Model):
@@ -37,32 +38,19 @@ class ArticleComment(models.Model):
             return self.author.username
 
 
-class CommentReaction(models.Model):
-    TYPES = (
-        ('like', 'like'),
-        ('dislike', 'dislike'),
-    )
-
+class CommentReaction(ReactionBaseModel):
     comment = models.ForeignKey(ArticleComment, on_delete=models.CASCADE, related_name='reactions')
-    type = models.CharField(choices=TYPES, max_length=8)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    class Meta:
+    class Meta(ReactionBaseModel.Meta):
         constraints = [
             models.UniqueConstraint(fields=['comment', 'user'], name='user_comment')
         ]
 
 
-class ArticleReaction(models.Model):
-    TYPES = (
-        ('like', 'like'),
-        ('dislike', 'dislike'),
-    )
+class ArticleReaction(ReactionBaseModel):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='reactions')
-    type = models.CharField(choices=TYPES, max_length=8)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    class Meta:
+    class Meta(ReactionBaseModel.Meta):
         constraints = [
             models.UniqueConstraint(fields=['article', 'user'], name='user_article')
         ]
