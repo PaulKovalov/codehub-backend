@@ -1,3 +1,4 @@
+
 from django.contrib.auth import login, logout
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
@@ -6,6 +7,7 @@ from rest_framework.response import Response
 from accounts.models import User
 from accounts.permissions import UsersPermissions, ViewUserPermission
 from accounts.serializers import UserSerializer, UserAuthenticationSerializer
+from common.email_utils import send_mail_new_user
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -19,6 +21,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
 
     def perform_create(self, serializer):
         new_user = serializer.save()
+        send_mail_new_user(new_user.email)
         login(self.request, new_user)
 
     @action(methods=['POST'], detail=False, serializer_class=UserAuthenticationSerializer)

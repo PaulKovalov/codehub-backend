@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
@@ -7,8 +9,8 @@ from accounts.models import User
 
 
 class UserCreateTest(TestCase):
-
-    def test_create_user(self):
+    @patch('accounts.views.send_mail_new_user')
+    def test_create_user(self, mocked_send_email):
         email = 'test_u1@email.com'
         username = 'test_u1'
         data = {
@@ -23,6 +25,7 @@ class UserCreateTest(TestCase):
         user = User.objects.all().first()
         self.assertEqual(user.email, email)
         self.assertEqual(user.username, username)
+        mocked_send_email.assert_called_once_with(user.email)
 
     def test_create_invalid_email_user(self):
         email = 'test_u1email.com'

@@ -61,7 +61,6 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = 'codehub.asgi.application'
 
 DATABASES = {
     'default': {
@@ -119,9 +118,16 @@ ASGI_APPLICATION = 'codehub.routing.application'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
 STATIC_URL = '/api-static/'
 
+# aws setup
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 AWS_DEFAULT_ACL = 'public-read'
 AWS_QUERYSTRING_AUTH = False
+# mail setup
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
