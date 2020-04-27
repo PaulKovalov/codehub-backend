@@ -9,7 +9,6 @@ sitemaps = dict(content=CodeHubSitemap)
 api_urls = [
     path('', include('articles.urls')),
     path('', include('accounts.urls')),
-    path('', include('home.urls')),
     path('', include('tutorials.urls')),
     path('', include('content.urls'))
 ]

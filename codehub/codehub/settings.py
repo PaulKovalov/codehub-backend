@@ -18,7 +18,6 @@ INSTALLED_APPS = [
     'articles.apps.ArticlesConfig',
     'tutorials.apps.TutorialsConfig',
     'common.apps.CommonConfig',
-    'home.apps.HomeConfig',
     'content.apps.ContentConfig',
     'django.contrib.admin',
     'django.contrib.auth',
