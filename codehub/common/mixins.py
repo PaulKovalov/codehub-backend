@@ -55,8 +55,9 @@ class ReactModelMixin:
         if reaction_model.objects.filter(**lookup_kwarg, user=self.request.user, type='dislike'):
             reaction_model.objects.get(**lookup_kwarg, user=self.request.user, type='dislike').delete()
             return Response(data='dec')
-        obj, created = reaction_model.objects.update_or_create(**lookup_kwarg, user=self.request.user,
-                                                               defaults={'type': 'dislike'})
+        else:
+            obj, created = reaction_model.objects.update_or_create(**lookup_kwarg, user=self.request.user,
+                                                                   defaults={'type': 'dislike'})
         if created:
             return Response(data='inc')
         else:
