@@ -34,9 +34,6 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     email = models.EmailField(blank=False, unique=True)
-    # who can see my profile? All, registered or nobody
-    view_permission_all = models.BooleanField(default=False)
-    view_permission_registered = models.BooleanField(default=False)
     objects = UserManager()
 
 

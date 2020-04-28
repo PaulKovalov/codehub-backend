@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts.models import User
-from accounts.permissions import UsersPermissions, ViewUserPermission
+from accounts.permissions import UsersPermissions
 from accounts.serializers import UserSerializer, UserAuthenticationSerializer
 from common.email_utils import send_mail_new_user
 
@@ -43,8 +43,3 @@ class UserViewSet(mixins.RetrieveModelMixin,
             self.check_object_permissions(self.request, user)
             return user
         return super().get_object()
-
-
-class ViewUserViewSet(viewsets.ModelViewSet):
-    serializer_class = UserSerializer
-    permission_class = [ViewUserPermission]
