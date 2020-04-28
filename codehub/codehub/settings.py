@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
+    'django.contrib.postgres',
     # custom apps
     'channels',
     'rest_framework',
@@ -109,7 +110,7 @@ TUTORIAL_TITLE_MIN_LENGTH = 8
 TUTORIAL_TITLE_MAX_LENGTH = 128
 TUTORIAL_PREVIEW_MAX_LENGTH = 1024
 COMMENT_MAX_LENGTH = 4096
-
+SEARCH_QUERY_MAX_LENGTH = 64
 # asgi setup
 ASGI_APPLICATION = 'codehub.routing.application'
 
@@ -130,5 +131,9 @@ EMAIL_PORT = os.environ.get('EMAIL_PORT')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-
+# host setup
 HOST = os.environ.get('HOST')
+
+# redis setup
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = os.environ.get('REDIS_PORT')

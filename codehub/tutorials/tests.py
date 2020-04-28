@@ -1,4 +1,6 @@
 # Create your tests here.
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.urls import reverse
 from model_mommy import mommy
@@ -171,7 +173,8 @@ class TestArticleComments(TestCase):
         self.published_article = mommy.make(TutorialArticle, tutorial=self.tutorial, author=self.author, published=True)
         self.client = APIClient()
 
-    def test_comment_create(self):
+    @patch('tutorials.views.send_mail_on_new_comment')
+    def test_comment_create(self, mocked_send_email):
         self.client.force_authenticate(self.random_user)
         url = reverse('tutorial_article-comments-list',
                       kwargs={'tutorial_pk': self.tutorial.pk, 'article_pk': self.published_article.id})
@@ -180,7 +183,9 @@ class TestArticleComments(TestCase):
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(TutorialArticleComment.objects.get(id=response.json()['id']))
+        created_comment = TutorialArticleComment.objects.get(id=response.json()['id'])
+        mocked_send_email.assert_called_once_with(self.published_article.author.email, self.random_user,
+                                                  created_comment)
 
     def test_comment_create_non_published_article(self):
         self.client.force_authenticate(self.random_user)

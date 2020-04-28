@@ -10,6 +10,9 @@ class TutorialArticle(ArticleBaseModel):
     author = models.ForeignKey(User, related_name='tutorial_articles', on_delete=models.CASCADE)
     order = models.PositiveIntegerField(default=0)
 
+    @property
+    def location(self):
+        return f'/tutorials/{self.tutorial.id}/articles/{self.id}'
 
 class Tutorial(models.Model):
     title = models.CharField(max_length=settings.TUTORIAL_TITLE_MAX_LENGTH, blank=False)
@@ -34,6 +37,10 @@ class Tutorial(models.Model):
     @property
     def username(self):
         return self.author.username
+
+    @property
+    def location(self):
+        return f'/tutorials/{self.id}'
 
 
 class TutorialArticleComment(CommentBaseModel):

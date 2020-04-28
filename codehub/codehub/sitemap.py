@@ -20,12 +20,7 @@ class CodeHubSitemap(Sitemap):
         return items
 
     def location(self, obj):
-        if isinstance(obj, Article):
-            return f'/articles/{obj.id}'
-        if isinstance(obj, Tutorial):
-            return f'/tutorials/{obj.id}'
-        if isinstance(obj, TutorialArticle):
-            return f'/tutorials/{obj.tutorial.id}/articles/{obj.id}'
+        return obj.location
 
     def lastmod(self, obj):
         return obj.last_modified

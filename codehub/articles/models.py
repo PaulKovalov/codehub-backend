@@ -7,6 +7,9 @@ from common.models import ReactionBaseModel, CommentBaseModel, ArticleBaseModel
 class Article(ArticleBaseModel):
     author = models.ForeignKey(User, related_name='articles', on_delete=models.CASCADE)
 
+    @property
+    def location(self):
+        return f'/articles/{self.id}'
 
 class ArticleComment(CommentBaseModel):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
