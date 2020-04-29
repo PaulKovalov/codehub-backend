@@ -27,11 +27,15 @@ class SearchEngine:
         if cached_value:
             cached_value = json.loads(cached_value)
             return {'time': SearchEngine._current_time() - start, 'results': cached_value}
-        query = SearchQuery(query_string)
-        articles_sr = self.articles.annotate(rank=SearchRank(self.vector + self.text_vector, query)).order_by('-rank')
-        tutorials_sr = self.tutorials.annotate(rank=SearchRank(self.vector, query)).order_by('-rank')
-        tutorial_articles_sr = self.tutorial_articles.annotate(
-            rank=SearchRank(self.vector + self.text_vector, query)).order_by('-rank')
+        query = SearchQuery(query_string, search_type='phrase')
+        articles_sr = self.articles.annotate(search=self.vector + self.text_vector).filter(search=query)
+        articles_sr.annotate(rank=SearchRank(self.vector + self.text_vector, query)).order_by('-rank')
+        tutorials_sr = self.tutorials.annotate(search=self.vector).filter(search=query)
+        tutorials_sr.annotate(rank=SearchRank(self.vector, query)).order_by('-rank')
+        tutorial_articles_sr = self.tutorial_articles.annotate(search=self.vector + self.text_vector).filter(
+            search=query)
+        tutorial_articles_sr.annotate(rank=SearchRank(self.vector + self.text_vector, query)).order_by('-rank')
+
         data = {
             'articles': ArticlePreviewSerializer(articles_sr, many=True).data,
             'tutorial_articles': TutorialArticlePreviewSerializer(tutorial_articles_sr, many=True).data,

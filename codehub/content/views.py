@@ -1,4 +1,5 @@
 # Create your views here.
+import urllib
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -47,9 +48,10 @@ class SearchView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        query = request.data.get('query')
+        query = request.query_params.get('query')
         if query is None:
             return Response()
+        query = urllib.parse.unquote(query)
         if len(query) > settings.SEARCH_QUERY_MAX_LENGTH:
             raise ValidationError(f'Query is longer than {settings.SEARCH_QUERY_MAX_LENGTH}')
         search_engine = SearchEngine()

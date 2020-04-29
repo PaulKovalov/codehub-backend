@@ -40,9 +40,6 @@ class TestSearch(TestCase):
     @patch('content.search_engine.SearchEngine._current_time', current_time)
     def test_search(self):
         query_string = 'sample'
-        url = reverse('search')
-        payload = {
-            'query': query_string
-        }
-        response = self.client.get(url, payload)
+        url = f'{reverse("search")}?query={query_string}'
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
