@@ -36,7 +36,7 @@ class ArticleBaseModel(models.Model):
     views = models.IntegerField(default=0)
     date_created = models.DateTimeField('Date created', auto_now_add=True)
     published = models.BooleanField(default=False)
-    text = models.TextField(default='article content', max_length=settings.ARTICLE_CONTENT_MAX_LENGTH)
+    text = models.TextField(default='article content')
     estimate_reading_time = models.IntegerField(default=1)
     preview = models.TextField()
     last_modified = models.DateTimeField(blank=True, null=True)
