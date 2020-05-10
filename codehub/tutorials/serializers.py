@@ -41,16 +41,7 @@ class TutorialArticlePreviewSerializer(serializers.ModelSerializer):
         model = TutorialArticle
         read_only_fields = (
             'id', 'date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview', 'username',
-            'tutorial')
-        fields = read_only_fields
-
-
-class MyTutorialArticlePreviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TutorialArticle
-        read_only_fields = (
-            'id', 'date_created', 'views', 'estimate_reading_time', 'author', 'title', 'preview', 'published',
-            'username', 'order')
+            'tutorial', 'published', 'order')
         fields = read_only_fields
 
 

@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django.contrib.postgres',
+    'django.contrib.sites',
     # custom apps
     'channels',
     'rest_framework',
@@ -137,3 +138,4 @@ HOST = os.environ.get('HOST')
 # redis setup
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')
+SITE_ID = 1

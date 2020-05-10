@@ -1,12 +1,19 @@
 from django.contrib.sitemaps import Sitemap
+from django.contrib.sites.models import Site
 
 from articles.models import Article
+from codehub import settings
 from tutorials.models import Tutorial, TutorialArticle
 
 
 class CodeHubSitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.5
+    protocol = 'https'
+
+    def get_urls(self, site=None, **kwargs):
+        site = Site.objects.get(id=settings.SITE_ID)
+        return super(CodeHubSitemap, self).get_urls(site=site, **kwargs)
 
     def items(self):
         items = []

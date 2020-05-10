@@ -14,6 +14,7 @@ class TutorialArticle(ArticleBaseModel):
     def location(self):
         return f'/tutorials/{self.tutorial.id}/articles/{self.id}'
 
+
 class Tutorial(models.Model):
     title = models.CharField(max_length=settings.TUTORIAL_TITLE_MAX_LENGTH, blank=False)
     views = models.IntegerField(default=0)

@@ -13,7 +13,7 @@ from tutorials.models import Tutorial, TutorialArticle, TutorialArticleCommentRe
 from tutorials.paginators import TutorialArticlesPaginator
 from tutorials.permissions import TutorialPermission, TutorialArticlePermission
 from tutorials.serializers import TutorialSerializer, TutorialArticleSerializer, TutorialArticlePreviewSerializer, \
-    MyTutorialArticlePreviewSerializer, MyTutorialSerializer, TutorialArticleCommentSerializer
+    MyTutorialSerializer, TutorialArticleCommentSerializer
 
 
 class TutorialsViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
@@ -79,8 +79,6 @@ class TutorialArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixi
     def get_serializer_class(self):
         if self.action == 'list':
             return TutorialArticlePreviewSerializer
-        if self.action == 'my':
-            return MyTutorialArticlePreviewSerializer
         return super().get_serializer_class()
 
     def perform_create(self, serializer):
