@@ -1,3 +1,5 @@
+import urllib
+
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.utils.crypto import get_random_string
@@ -52,11 +54,12 @@ class UserViewSet(mixins.RetrieveModelMixin,
         email = request.query_params.get('email')
         if email is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        email = urllib.parse.unquote(email)
         if User.objects.filter(email=email):
             request_id = get_random_string(length=32)
-            ChangePasswordRequest.objects.delete(email=email)
+            ChangePasswordRequest.objects.filter(email=email).delete()
             ChangePasswordRequest.objects.create(email=email, request_id=request_id)
-            url = f'{settings.HOST}/accounts/create-new-password/'
+            url = f'{settings.HOST}/accounts/create-new-password/?request_id={request_id}'
             send_mail_password_reset.delay(email, url)
         return Response()
 
@@ -65,9 +68,10 @@ class UserViewSet(mixins.RetrieveModelMixin,
     def set_new_password(self, request):
         serializer = ChangePasswordRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
+        reset_request = ChangePasswordRequest.objects.get(request_id=serializer.validated_data['request_id'])
         new_password = serializer.validated_data['password']
-        user = User.objects.get(email=email)
+        user = User.objects.get(email=reset_request.email)
         user.set_password(new_password)
         user.save()
+        reset_request.delete()
         return Response()

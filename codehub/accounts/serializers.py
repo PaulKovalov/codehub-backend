@@ -50,4 +50,4 @@ class ChangePasswordRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChangePasswordRequest
-        fields = ('email', 'request_id', 'password')
+        fields = ('request_id', 'password')
