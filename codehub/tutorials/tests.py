@@ -130,7 +130,7 @@ class TestTutorialArticles(TestCase):
         self.client.force_authenticate(self.author)
         url = reverse('tutorial-articles-detail', kwargs={'tutorial_pk': self.tutorial.pk, 'pk': tutorial_article.pk})
         data = {
-            'text': 'new text here' * 5
+            'text': 'new text here' * 10
         }
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -141,7 +141,7 @@ class TestTutorialArticles(TestCase):
         self.client.force_authenticate(self.author)
         url = reverse('tutorial-articles-detail', kwargs={'tutorial_pk': self.tutorial.pk, 'pk': tutorial_article.pk})
         data = {
-            'text': 'new text here' * 5
+            'text': 'new text here' * 10
         }
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -173,7 +173,7 @@ class TestArticleComments(TestCase):
         self.published_article = mommy.make(TutorialArticle, tutorial=self.tutorial, author=self.author, published=True)
         self.client = APIClient()
 
-    @patch('tutorials.views.send_mail_on_new_comment')
+    @patch('tutorials.views.send_mail_on_new_comment.delay')
     def test_comment_create(self, mocked_send_email):
         self.client.force_authenticate(self.random_user)
         url = reverse('tutorial_article-comments-list',
@@ -184,8 +184,9 @@ class TestArticleComments(TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         created_comment = TutorialArticleComment.objects.get(id=response.json()['id'])
-        mocked_send_email.assert_called_once_with(self.published_article.author.email, self.random_user,
-                                                  created_comment)
+        mocked_send_email.assert_called_once_with(self.published_article.author.email, self.random_user.username,
+                                                  self.published_article.location, created_comment.text,
+                                                  self.published_article.title)
 
     def test_comment_create_non_published_article(self):
         self.client.force_authenticate(self.random_user)

@@ -20,7 +20,7 @@ class TestArticleCreate(TestCase):
     def test_create_article(self):
         data = {
             'title': 'Random article title',
-            'text': 'random article text' * 5
+            'text': 'random article text' * 10
         }
         url = reverse('articles-list')
         self.client.force_authenticate(self.author)
@@ -91,7 +91,7 @@ class TestArticleCreate(TestCase):
         self.client.force_authenticate(self.author)
         url = reverse('articles-detail', kwargs={'pk': article.pk})
         patch_data = {
-            'text': 'new text here' * 5
+            'text': 'new text here' * 10
         }
         response = self.client.patch(url, patch_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -101,7 +101,7 @@ class TestArticleCreate(TestCase):
         self.client.force_authenticate(self.author)
         url = reverse('articles-detail', kwargs={'pk': article.pk})
         patch_data = {
-            'text': 'new text here' * 5
+            'text': 'new text here' * 10
         }
         response = self.client.patch(url, patch_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -131,7 +131,7 @@ class TestArticleComments(TestCase):
         self.published_article = mommy.make(Article, author=self.author, published=True)
         self.client = APIClient()
 
-    @patch('articles.views.send_mail_on_new_comment')
+    @patch('articles.views.send_mail_on_new_comment.delay')
     def test_comment_create(self, mocked_send_email):
         self.client.force_authenticate(self.random_user)
         url = reverse('article-comments-list', kwargs={'article_pk': self.published_article.id})
@@ -141,8 +141,9 @@ class TestArticleComments(TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         created_comment = ArticleComment.objects.get(id=response.json()['id'])
-        mocked_send_email.assert_called_once_with(self.published_article.author.email, self.random_user,
-                                                  created_comment)
+        mocked_send_email.assert_called_once_with(self.published_article.author.email, self.random_user.username,
+                                                  self.published_article.location, created_comment.text,
+                                                  self.published_article.title)
 
     def test_comment_create_non_published_article(self):
         self.client.force_authenticate(self.random_user)

@@ -9,7 +9,7 @@ from accounts.models import User
 
 
 class UserCreateTest(TestCase):
-    @patch('accounts.views.send_mail_new_user')
+    @patch('accounts.views.send_email_on_signup.delay')
     def test_create_user(self, mocked_send_email):
         email = 'test_u1@email.com'
         username = 'test_u1'
