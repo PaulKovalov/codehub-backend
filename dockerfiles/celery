@@ -1,0 +1,17 @@
+FROM alpine:3.10
+
+RUN apk update && apk add --no-cache \
+    python3 \
+    python3-dev \
+    musl-dev \
+    libffi-dev \
+    postgresql-dev \
+    gcc
+
+
+WORKDIR home/
+COPY requirements.txt ./
+RUN pip3 install -r requirements.txt
+COPY ./codehub ./codehub
+WORKDIR codehub
+CMD celery -A codehub worker -l info

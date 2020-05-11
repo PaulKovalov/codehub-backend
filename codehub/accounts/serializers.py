@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
-from .models import User
+from .models import User, ChangePasswordRequest
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -43,3 +43,11 @@ class ViewUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'articles', 'tutorials')
+
+
+class ChangePasswordRequestSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = ChangePasswordRequest
+        fields = ('email', 'request_id', 'password')

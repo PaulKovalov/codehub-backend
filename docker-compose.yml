@@ -40,3 +40,19 @@ services:
     container_name: 'redis'
     ports:
       - '6379:6379'
+  celery:
+    image: code-hub.org:5000/codehub-celery
+    container_name: celery
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./config/backend.env
+  celery-beat:
+    image: code-hub.org:5000/codehub-celery-beat
+    container_name: celery_beat
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./config/backend.env

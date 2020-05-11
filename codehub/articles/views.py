@@ -10,7 +10,7 @@ from articles.serializers import ArticleSerializer, ArticlePreviewSerializer, My
     ArticleCommentSerializer
 from articles.tools import get_preview, get_reading_time
 from articles.utils import DefaultPaginator
-from common.email_utils import send_mail_on_new_comment
+from codehub.tasks import send_mail_on_new_comment
 from common.mixins import MyContentListMixin, RecentContentListMixin, CustomRetrieveMixin, ReactModelMixin
 
 
@@ -76,7 +76,8 @@ class ArticleCommentsViewSet(viewsets.ModelViewSet, ReactModelMixin):
         author = self.request.user
         article = get_object_or_404(Article, id=self.kwargs['article_pk'], published=True)
         comment = serializer.save(author=author, article=article)
-        send_mail_on_new_comment(article.author.email, author, comment)
+        send_mail_on_new_comment.delay(article.author.email, author.username, article.location, comment.text,
+                                       article.title)
 
     def get_queryset(self):
         article = get_object_or_404(Article, id=self.kwargs['article_pk'], published=True)

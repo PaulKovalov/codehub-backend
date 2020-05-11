@@ -45,3 +45,9 @@ class UserLinks(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['link', 'user'], name='Link-User constraint')
         ]
+
+
+class ChangePasswordRequest(models.Model):
+    email = models.EmailField()
+    request_id = models.CharField(max_length=32)
+    date_created = models.DateTimeField(auto_now_add=True)
