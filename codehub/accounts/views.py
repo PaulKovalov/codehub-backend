@@ -59,7 +59,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
             request_id = get_random_string(length=32)
             ChangePasswordRequest.objects.filter(email=email).delete()
             ChangePasswordRequest.objects.create(email=email, request_id=request_id)
-            url = f'{settings.HOST}/accounts/create-new-password/?request_id={request_id}'
+            url = f'{settings.HOST}/password-change-new/?request_id={request_id}'
             send_mail_password_reset.delay(email, url)
         return Response()
 

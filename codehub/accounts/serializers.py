@@ -51,3 +51,8 @@ class ChangePasswordRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChangePasswordRequest
         fields = ('request_id', 'password')
+
+    def validate(self, attrs):
+        if not ChangePasswordRequest.objects.filter(request_id=attrs['request_id']):
+            raise serializers.ValidationError('Request id not found')
+        return attrs

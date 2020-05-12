@@ -142,6 +142,7 @@ SITE_ID = 1
 
 # celery setup
 CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 7200}  # 2 hours
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
