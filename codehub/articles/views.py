@@ -76,8 +76,9 @@ class ArticleCommentsViewSet(viewsets.ModelViewSet, ReactModelMixin):
         author = self.request.user
         article = get_object_or_404(Article, id=self.kwargs['article_pk'], published=True)
         comment = serializer.save(author=author, article=article)
-        send_mail_on_new_comment.delay(article.author.email, author.username, article.location, comment.text,
-                                       article.title)
+        if article.author.notifications.new_comment:
+            send_mail_on_new_comment.delay(article.author.email, author.username, article.location, comment.text,
+                                           article.title)
 
     def get_queryset(self):
         article = get_object_or_404(Article, id=self.kwargs['article_pk'], published=True)

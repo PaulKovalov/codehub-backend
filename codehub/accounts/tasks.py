@@ -11,7 +11,7 @@ from codehub.celery import app
 
 
 @app.task
-def send_email_on_signup(to: str):
+def send_mail_on_signup(to: str):
     # TODO write some cool text here
     email_text = """Welcome to code-hub.org!\nHere you can share your knowledge in math, engineering, computer science, programming and related."""
     send_mail('Welcome to code-hub.org!', email_text, settings.EMAIL_HOST_USER, [to])

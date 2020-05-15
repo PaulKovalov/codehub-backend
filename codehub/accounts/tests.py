@@ -8,12 +8,13 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 from model_mommy import mommy
 from rest_framework import status
+from rest_framework.test import APIClient
 
-from accounts.models import User, ChangePasswordRequest
+from accounts.models import User, ChangePasswordRequest, UserNotifications
 
 
 class UserCreateTest(TestCase):
-    @patch('accounts.views.send_email_on_signup.delay')
+    @patch('accounts.views.send_mail_on_signup.delay')
     def test_create_user(self, mocked_send_email):
         email = 'test_u1@email.com'
         username = 'test_u1'
@@ -29,6 +30,7 @@ class UserCreateTest(TestCase):
         user = User.objects.all().first()
         self.assertEqual(user.email, email)
         self.assertEqual(user.username, username)
+        self.assertTrue(UserNotifications.objects.filter(user=user))
         mocked_send_email.assert_called_once_with(user.email)
 
     def test_create_invalid_email_user(self):
@@ -79,7 +81,7 @@ class UserCreateTest(TestCase):
         self.assertTrue(ChangePasswordRequest.objects.filter(email=user.email))
         request_id = ChangePasswordRequest.objects.get(email=user.email).request_id
         mocked_send_mail.assert_called_once_with(user.email,
-                                                 f'{settings.HOST}/accounts/create-new-password/?request_id={request_id}')
+                                                 f'{settings.HOST}/password-change-new/?request_id={request_id}')
 
     @patch('accounts.views.send_mail_password_reset.delay')
     def test_request_password_change_non_existing(self, mocked_send_mail):
@@ -107,3 +109,26 @@ class UserCreateTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(authenticate(username=user.email, password=data['password']))
         self.assertFalse(ChangePasswordRequest.objects.filter(email=user.email))
+
+
+class TestUserNotifications(TestCase):
+    def setUp(self) -> None:
+        self.user = mommy.make(User)
+        self.client = APIClient()
+
+    def test_list_notifications(self):
+        url = reverse('notifications-list', kwargs={'account_pk': self.user.id})
+        self.client.force_authenticate(self.user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()[0], dict(new_comment=True, comment_reply=True,
+                                                  id=UserNotifications.objects.get(user=self.user).id))
+
+    def test_change_notification_settings(self):
+        self.client.force_authenticate(self.user)
+        notification = self.user.notifications
+        url = reverse('notifications-detail', kwargs={'account_pk': self.user.id, 'pk': notification.id})
+        data = dict(new_comment=False, comment_reply=False)
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), dict(new_comment=False, comment_reply=False, id=notification.id))

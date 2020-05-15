@@ -5,13 +5,14 @@ from django.contrib.auth import login, logout
 from django.utils.crypto import get_random_string
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from accounts.models import User, ChangePasswordRequest
+from accounts.models import User, ChangePasswordRequest, UserNotifications
 from accounts.permissions import UsersPermissions
-from accounts.serializers import UserSerializer, UserAuthenticationSerializer, ChangePasswordRequestSerializer
-from accounts.tasks import send_email_on_signup, send_mail_password_reset
+from accounts.serializers import UserSerializer, UserAuthenticationSerializer, ChangePasswordRequestSerializer, \
+    UserNotificationsSerializer
+from accounts.tasks import send_mail_on_signup, send_mail_password_reset
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -25,7 +26,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
 
     def perform_create(self, serializer):
         new_user = serializer.save()
-        send_email_on_signup.delay(new_user.email)
+        send_mail_on_signup.delay(new_user.email)  # send task to celery
         login(self.request, new_user)
 
     @action(methods=['POST'], detail=False, serializer_class=UserAuthenticationSerializer)
@@ -75,3 +76,11 @@ class UserViewSet(mixins.RetrieveModelMixin,
         user.save()
         reset_request.delete()
         return Response()
+
+
+class UserNotificationsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.UpdateModelMixin):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserNotificationsSerializer
+
+    def get_queryset(self):
+        return UserNotifications.objects.filter(user=self.request.user)

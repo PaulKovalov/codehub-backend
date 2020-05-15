@@ -51,3 +51,9 @@ class ChangePasswordRequest(models.Model):
     email = models.EmailField()
     request_id = models.CharField(max_length=32)
     date_created = models.DateTimeField(auto_now_add=True)
+
+
+class UserNotifications(models.Model):
+    new_comment = models.BooleanField(default=True)
+    comment_reply = models.BooleanField(default=True)
+    user = models.OneToOneField(User, related_name='notifications', on_delete=models.CASCADE, null=True)

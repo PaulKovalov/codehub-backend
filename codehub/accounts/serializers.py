@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
-from .models import User, ChangePasswordRequest
+from .models import User, ChangePasswordRequest, UserNotifications
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -56,3 +56,9 @@ class ChangePasswordRequestSerializer(serializers.ModelSerializer):
         if not ChangePasswordRequest.objects.filter(request_id=attrs['request_id']):
             raise serializers.ValidationError('Request id not found')
         return attrs
+
+
+class UserNotificationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserNotifications
+        fields = ('new_comment', 'comment_reply', 'id')
