@@ -41,6 +41,13 @@ class ArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixins.Updat
         serializer.save(author=self.request.user, preview=get_preview(text),
                         estimate_reading_time=get_reading_time(text))
 
+    def perform_update(self, serializer):
+        if serializer.validated_data.get('text'):
+            text = serializer.validated_data['text']
+            serializer.save(estimate_reading_time=get_reading_time(text))
+        else:
+            super().perform_update(serializer)
+
     def get_serializer_class(self, *args, **kwargs):
         if self.action == 'list' or self.action == 'recent':
             return ArticlePreviewSerializer

@@ -116,6 +116,13 @@ class TutorialArticleCommentsViewSet(viewsets.ModelViewSet, ReactModelMixin):
         send_mail_on_new_comment.delay(article.author.email, author.username, article.location, comment.text,
                                        article.title)
 
+    def perform_update(self, serializer):
+        if serializer.validated_data.get('text'):
+            text = serializer.validated_data['text']
+            serializer.save(estimate_reading_time=get_reading_time(text))
+        else:
+            super().perform_update(serializer)
+
     def get_queryset(self):
         article = get_object_or_404(TutorialArticle, id=self.kwargs['article_pk'], published=True)
         return article.comments.all()
