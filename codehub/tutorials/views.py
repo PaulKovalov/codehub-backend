@@ -90,6 +90,13 @@ class TutorialArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixi
         serializer.save(author=self.request.user, tutorial=tutorial, preview=get_preview(text),
                         estimate_reading_time=get_reading_time(text), order=last_article_order + 1)
 
+    def perform_update(self, serializer):
+        if serializer.validated_data.get('text'):
+            text = serializer.validated_data['text']
+            serializer.save(preview=get_preview(text), estimate_reading_time=get_reading_time(text))
+        else:
+            super().perform_update(serializer)
+
     @action(methods=['GET'], detail=False, permission_classes=[AllowAny], url_path='table-of-content')
     def table_of_content(self, request, *args, **kwargs):
         qs = self.get_queryset()
@@ -115,13 +122,6 @@ class TutorialArticleCommentsViewSet(viewsets.ModelViewSet, ReactModelMixin):
         comment = serializer.save(author=author, article=article)
         send_mail_on_new_comment.delay(article.author.email, author.username, article.location, comment.text,
                                        article.title)
-
-    def perform_update(self, serializer):
-        if serializer.validated_data.get('text'):
-            text = serializer.validated_data['text']
-            serializer.save(estimate_reading_time=get_reading_time(text))
-        else:
-            super().perform_update(serializer)
 
     def get_queryset(self):
         article = get_object_or_404(TutorialArticle, id=self.kwargs['article_pk'], published=True)

@@ -44,7 +44,7 @@ class ArticlesViewSet(mixins.CreateModelMixin, CustomRetrieveMixin, mixins.Updat
     def perform_update(self, serializer):
         if serializer.validated_data.get('text'):
             text = serializer.validated_data['text']
-            serializer.save(estimate_reading_time=get_reading_time(text))
+            serializer.save(preview=get_preview(text), estimate_reading_time=get_reading_time(text))
         else:
             super().perform_update(serializer)
 

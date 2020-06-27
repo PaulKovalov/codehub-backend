@@ -95,6 +95,7 @@ class TestArticleCreate(TestCase):
         }
         response = self.client.patch(url, patch_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Article.objects.get(id=article.id).text, patch_data['text'])
 
     def test_edit_published_article(self):
         article = mommy.make(Article, author=self.author, published=True)
@@ -105,6 +106,7 @@ class TestArticleCreate(TestCase):
         }
         response = self.client.patch(url, patch_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Article.objects.get(id=article.id).text, patch_data['text'])
 
     def test_like_article(self):
         article = mommy.make(Article, author=self.author, published=True)
