@@ -26,6 +26,8 @@ class BaseArticleSerializer(serializers.ModelSerializer):
         published = validated_data.get('published')
         new_text = validated_data.get('text')
         new_title = validated_data.get('title')
+        new_estimated_reading_time = validated_data.get('estimate_reading_time')
+        new_preview = validated_data.get('preview')
         if published is not None:
             user = self.context.get('request').user
             if user.is_superuser:
@@ -34,16 +36,16 @@ class BaseArticleSerializer(serializers.ModelSerializer):
                 raise PermissionDenied('This field can be edited only by superuser')
         if new_text:
             instance.text = new_text
-            instance.last_modified = timezone.now()
-            if isinstance(instance, TutorialArticle):
-                instance.tutorial.last_modified = timezone.now()
-                instance.tutorial.save()
         if new_title:
             instance.title = new_title
-            instance.last_modified = timezone.now()
-            if isinstance(instance, TutorialArticle):
-                instance.tutorial.last_modified = timezone.now()
-                instance.tutorial.save()
+        if new_estimated_reading_time:
+            instance.estimate_reading_time = new_estimated_reading_time
+        if new_preview:
+            instance.preview = new_preview
+        instance.last_modified = timezone.now()
+        if isinstance(instance, TutorialArticle):
+            instance.tutorial.last_modified = timezone.now()
+            instance.tutorial.save()
         instance.published = False
         instance.save()
         return instance
