@@ -13,9 +13,9 @@ class TutorialArticleSerializer(BaseArticleSerializer):
     class Meta:
         model = TutorialArticle
         read_only_fields = (
-            'date_created', 'views', 'id', 'author', 'username', 'tutorial', 'likes', 'dislikes')
-        fields = ('title', 'text', 'published', 'nav', 'last_modified', 'estimate_reading_time',
-                  'preview') + read_only_fields
+            'date_created', 'views', 'id', 'author', 'username', 'tutorial', 'likes', 'dislikes',
+            'estimate_reading_time', 'preview')
+        fields = ('title', 'text', 'published', 'nav', 'last_modified') + read_only_fields
 
     def get_likes(self, instance):
         return instance.reactions.all().filter(type='like').count()

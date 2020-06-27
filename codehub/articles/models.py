@@ -11,6 +11,7 @@ class Article(ArticleBaseModel):
     def location(self):
         return f'/articles/{self.id}'
 
+
 class ArticleComment(CommentBaseModel):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='article_comments')
