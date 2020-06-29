@@ -1,5 +1,8 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
+
+from content.models import CodehubFileField
 
 
 class UserManager(UserManager):
@@ -11,6 +14,7 @@ class UserManager(UserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
+        user.avatar = settings.DEFAULT_AVATAR_URL
         user.save(using=self._db)
         return user
 
@@ -35,6 +39,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
     email = models.EmailField(blank=False, unique=True)
     objects = UserManager()
+    avatar = CodehubFileField(max_length=200, upload_to='media', null=True, blank=True)
 
 
 class UserLinks(models.Model):

@@ -112,6 +112,7 @@ TUTORIAL_TITLE_MAX_LENGTH = int(os.environ.get('TUTORIAL_TITLE_MAX_LENGTH', 128)
 TUTORIAL_PREVIEW_MAX_LENGTH = int(os.environ.get('TUTORIAL_PREVIEW_MAX_LENGTH', 1024))
 COMMENT_MAX_LENGTH = int(os.environ.get('COMMENT_MAX_LENGTH', 4096))
 SEARCH_QUERY_MAX_LENGTH = int(os.environ.get('SEARCH_QUERY_MAX_LENGTH', 64))
+DEFAULT_AVATAR_URL = os.environ.get('DEFAULT_AVATAR_URL', '')
 # asgi setup
 ASGI_APPLICATION = 'codehub.routing.application'
 
