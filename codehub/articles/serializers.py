@@ -11,7 +11,8 @@ class ArticleSerializer(BaseArticleSerializer):
     class Meta:
         model = Article
         read_only_fields = ('date_created', 'views', 'id', 'author', 'username',
-                            'last_modified', 'likes', 'dislikes', 'estimate_reading_time', 'preview')
+                            'last_modified', 'likes', 'dislikes', 'estimate_reading_time', 'preview',
+                            'author_avatar')
         fields = ('title', 'text', 'published') + read_only_fields
 
     def get_likes(self, instance):

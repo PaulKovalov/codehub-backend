@@ -14,7 +14,7 @@ class TutorialArticleSerializer(BaseArticleSerializer):
         model = TutorialArticle
         read_only_fields = (
             'date_created', 'views', 'id', 'author', 'username', 'tutorial', 'likes', 'dislikes',
-            'estimate_reading_time', 'preview')
+            'estimate_reading_time', 'preview', 'author_avatar')
         fields = ('title', 'text', 'published', 'nav', 'last_modified') + read_only_fields
 
     def get_likes(self, instance):

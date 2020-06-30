@@ -48,5 +48,9 @@ class ArticleBaseModel(models.Model):
     def username(self):
         return self.author.username
 
+    @property
+    def author_avatar(self):
+        return self.author.avatar.url
+
     class Meta:
         abstract = True

@@ -1,10 +1,15 @@
+from django.conf import settings
 from django.contrib.auth import authenticate
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from .models import User, ChangePasswordRequest, UserNotifications
 
 
 class UserSerializer(serializers.ModelSerializer):
+    avatar = Base64ImageField(required=False)
+
     class Meta:
         model = User
         fields = ('id', 'username', 'password', 'email', 'avatar')
@@ -22,6 +27,11 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+    def validate_avatar(self, value):
+        if value.size > settings.MAX_AVATAR_SIZE:
+            raise ValidationError(f'File size can not exceed {settings.MAX_AVATAR_SIZE} bytes')
+        return value
 
 
 class UserAuthenticationSerializer(serializers.Serializer):
