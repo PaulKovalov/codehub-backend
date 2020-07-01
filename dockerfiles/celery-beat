@@ -6,7 +6,9 @@ RUN apk update && apk add --no-cache \
     musl-dev \
     libffi-dev \
     postgresql-dev \
-    gcc
+    gcc \
+    jpeg-dev \
+    zlib-dev
 
 
 WORKDIR home/
