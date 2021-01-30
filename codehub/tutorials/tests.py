@@ -7,7 +7,7 @@ from model_mommy import mommy
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from accounts.models import User
+from accounts.mommy_recipes import user_recipe
 from tutorials.models import Tutorial, TutorialArticle, TutorialArticleComment, TutorialArticleCommentReaction, \
     TutorialArticleReaction
 from tutorials.serializers import TutorialArticlePreviewSerializer, TutorialSerializer, \
@@ -17,7 +17,7 @@ from tutorials.serializers import TutorialArticlePreviewSerializer, TutorialSeri
 class TestTutorials(TestCase):
     def setUp(self) -> None:
         self.client = APIClient()
-        self.author = mommy.make(User)
+        self.author = user_recipe.make()
         self.tutorial = mommy.make(Tutorial, author=self.author)
 
     def test_tutorials_list(self):
@@ -84,7 +84,7 @@ class TestTutorials(TestCase):
 class TestTutorialArticles(TestCase):
     def setUp(self) -> None:
         self.client = APIClient()
-        self.author = mommy.make(User)
+        self.author = user_recipe.make()
         self.tutorial = mommy.make(Tutorial, author=self.author)
 
     def test_tutorial_article_create(self):
@@ -166,8 +166,8 @@ class TestTutorialArticles(TestCase):
 
 class TestArticleComments(TestCase):
     def setUp(self) -> None:
-        self.author = mommy.make(User)
-        self.random_user = mommy.make(User)
+        self.author = user_recipe.make()
+        self.random_user = user_recipe.make()
         self.tutorial = mommy.make(Tutorial, author=self.author, published=True)
         self.article = mommy.make(TutorialArticle, tutorial=self.tutorial, author=self.author)
         self.published_article = mommy.make(TutorialArticle, tutorial=self.tutorial, author=self.author, published=True)

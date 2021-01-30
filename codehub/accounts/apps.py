@@ -5,4 +5,5 @@ class AccountsConfig(AppConfig):
     name = 'accounts'
 
     def ready(self):
-        pass
+        # noinspection PyUnresolvedReferences
+        from accounts import signals

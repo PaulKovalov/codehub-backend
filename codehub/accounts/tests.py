@@ -6,11 +6,11 @@ from django.contrib.auth import authenticate
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from model_mommy import mommy
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import User, ChangePasswordRequest, UserNotifications
+from accounts.mommy_recipes import user_recipe
 
 
 class UserCreateTest(TestCase):
@@ -74,7 +74,7 @@ class UserCreateTest(TestCase):
 
     @patch('accounts.views.send_mail_password_reset.delay')
     def test_request_password_change_existing(self, mocked_send_mail):
-        user = mommy.make(User)
+        user = user_recipe.make()
         url = f'{reverse("accounts-request-password-change")}?email={urllib.parse.quote(user.email)}'
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -99,7 +99,7 @@ class UserCreateTest(TestCase):
 
     def test_change_password(self):
         url = reverse('accounts-set-new-password')
-        user = mommy.make(User)
+        user = user_recipe.make()
         reset_request = ChangePasswordRequest.objects.create(email=user.email, request_id=get_random_string())
         data = {
             'request_id': reset_request.request_id,
@@ -113,7 +113,7 @@ class UserCreateTest(TestCase):
 
 class TestUserNotifications(TestCase):
     def setUp(self) -> None:
-        self.user = mommy.make(User)
+        self.user = user_recipe.make()
         self.client = APIClient()
 
     def test_list_notifications(self):

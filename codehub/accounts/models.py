@@ -5,7 +5,7 @@ from django.db import models
 from content.models import CodehubFileField
 
 
-class UserManager(UserManager):
+class CodehubUserManager(UserManager):
 
     def _create_user(self, email, password, **extra_fields):
         """
@@ -38,7 +38,7 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     email = models.EmailField(blank=False, unique=True)
-    objects = UserManager()
+    objects = CodehubUserManager()
     avatar = CodehubFileField(max_length=200, upload_to='media', null=True, blank=True)
 
 

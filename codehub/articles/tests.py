@@ -6,7 +6,7 @@ from model_mommy import mommy
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from accounts.models import User
+from accounts.mommy_recipes import user_recipe
 from articles.models import Article, ArticleComment, CommentReaction, ArticleReaction
 from articles.serializers import ArticlePreviewSerializer, ArticleCommentSerializer
 
@@ -15,7 +15,7 @@ class TestArticleCreate(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.author = mommy.make(User)
+        self.author = user_recipe.make()
 
     def test_create_article(self):
         data = {
@@ -42,14 +42,14 @@ class TestArticleCreate(TestCase):
 
     def test_list_articles(self):
         article_count = 5
-        mommy.make(Article, published=True, _quantity=article_count)
+        mommy.make(Article, published=True, author=self.author, _quantity=article_count)
         url = reverse('articles-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()['results']), article_count)
 
     def test_article_retrieve(self):
-        article = mommy.make(Article, published=True, views=10)
+        article = mommy.make(Article, author=self.author, published=True, views=10)
         url = reverse('articles-detail', kwargs={'pk': article.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -57,7 +57,7 @@ class TestArticleCreate(TestCase):
         self.assertEqual(Article.objects.get(id=article.id).views, 11)
 
     def test_recent_articles(self):
-        recent_article = mommy.make(Article, published=True)
+        recent_article = mommy.make(Article, published=True, author=self.author)
         url = reverse('articles-recent')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -128,8 +128,8 @@ class TestArticleCreate(TestCase):
 
 class TestArticleComments(TestCase):
     def setUp(self) -> None:
-        self.author = mommy.make(User)
-        self.random_user = mommy.make(User)
+        self.author = user_recipe.make()
+        self.random_user = user_recipe.make()
         self.article = mommy.make(Article, author=self.author)
         self.published_article = mommy.make(Article, author=self.author, published=True)
         self.client = APIClient()

@@ -16,4 +16,4 @@ COPY requirements.txt ./
 RUN pip3 install -r requirements.txt
 COPY ./codehub ./codehub
 WORKDIR codehub
-CMD celery -A codehub beat -l info
+CMD celery -A codehub beat -l info --pidfile=
