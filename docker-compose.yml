@@ -32,9 +32,6 @@ services:
     restart: always
     ports:
       - '80:80'
-    links:
-      - api-server
-      - angular
   redis:
     image: redis:latest
     container_name: 'redis'

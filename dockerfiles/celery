@@ -9,10 +9,13 @@ RUN apk update && apk add --no-cache \
     zlib-dev
 
 RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
 FROM python:3.8-alpine
+RUN apk update && apk add --no-cache \
+    postgresql-dev
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR home/
