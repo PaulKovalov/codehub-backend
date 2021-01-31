@@ -1,58 +1,51 @@
 version: '3.0'
 services:
   api-server:
+    network_mode: host
     image: code-hub.org:5000/codehub-backend
     container_name: 'api_server'
     restart: always
-    depends_on:
-      - postgres
-    expose:
-      - '8000'
+    ports:
+      - '8000:8000'
     env_file:
       - ./config/backend.env
-  postgres:
-    image: code-hub.org:5000/codehub-postgres
-    container_name: 'postgresql'
-    restart: always
-    expose:
-      - '5432'
-    env_file:
-      - ./config/db.env
   angular:
     image: code-hub.org:5000/codehub-frontend
     container_name: 'angular'
     restart: always
-    expose:
-      - '4200'
+    ports:
+      - '4200:4200'
     env_file:
       - ./config/angular.env
   nginx:
+    network_mode: host
     image: code-hub.org:5000/codehub-nginx
     container_name: 'nginx_main'
     restart: always
     ports:
       - '80:80'
   redis:
+    network_mode: host
     image: redis:latest
     container_name: 'redis'
     restart: always
     ports:
       - '6379:6379'
   celery:
+    network_mode: host
     image: code-hub.org:5000/codehub-celery
     container_name: celery
     restart: always
     depends_on:
-      - postgres
       - redis
     env_file:
       - ./config/backend.env
   celery-beat:
+    network_mode: host
     image: code-hub.org:5000/codehub-celery-beat
     container_name: celery_beat
     restart: always
     depends_on:
-      - postgres
       - redis
     env_file:
       - ./config/backend.env

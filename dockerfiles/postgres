@@ -1,2 +1,0 @@
-FROM postgres:10-alpine
-COPY ./startup-scripts/init-db.sh /docker-entrypoint-initdb.d/01-db-setup.sh
