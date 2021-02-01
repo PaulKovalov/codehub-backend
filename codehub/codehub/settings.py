@@ -89,6 +89,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+TEST_RUNNER = 'codehub.test_runner.CodehubTestRunner'
+
 AUTH_USER_MODEL = "accounts.User"
 
 LANGUAGE_CODE = 'en-us'

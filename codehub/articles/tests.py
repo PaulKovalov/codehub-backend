@@ -178,7 +178,8 @@ class TestArticleComments(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(ArticleComment.objects.get(id=comment.id).text, data['text'])
 
-    def test_comment_reply(self):
+    @patch('articles.views.send_mail_on_new_comment.delay')
+    def test_comment_reply(self, mocked_send_email):
         comment = mommy.make(ArticleComment, author=self.random_user, article=self.published_article)
         self.client.force_authenticate(self.random_user)
         url = reverse('article-comments-list', kwargs={'article_pk': self.published_article.id})
@@ -188,6 +189,11 @@ class TestArticleComments(TestCase):
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        mocked_send_email.assert_called_once_with(self.published_article.author.email,
+                                                  self.random_user.username,
+                                                  self.published_article.location,
+                                                  data['text'],
+                                                  self.published_article.title)
         self.assertTrue(
             response.json()['id'] in ArticleComment.objects.get(id=comment.id).replies.values_list('id', flat=True))
 

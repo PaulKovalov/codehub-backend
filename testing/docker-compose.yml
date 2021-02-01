@@ -1,0 +1,28 @@
+version: '3.0'
+services:
+  postgres:
+    image: postgres:10
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+  testing:
+    build:
+      context: ../
+      dockerfile: ./dockerfiles/app_tests
+    depends_on:
+      - postgres
+    environment:
+      SECRET_KEY: supersecret
+      DEBUG: "True"
+      DJANGO_SETTINGS_MODULE: codehub.settings
+      HOST: http://localhost:8000
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DEFAULT_AVATAR_URL: media/default-avatar.png
+      AWS_STORAGE_BUCKET_NAME: s3-dir
+
