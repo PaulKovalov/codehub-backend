@@ -15,4 +15,5 @@ COPY requirements.txt ./
 RUN pip3 install -r requirements.txt
 COPY ./codehub ./codehub
 WORKDIR ./codehub
-CMD python3 manage.py test
+COPY ./testing/wait-for-it.sh ./
+CMD ./wait-for-it.sh postgres:5432 -- python3 manage.py test
