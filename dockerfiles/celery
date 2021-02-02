@@ -1,6 +1,8 @@
-FROM python:3.8-alpine as builder
+FROM alpine:3.10
 
 RUN apk update && apk add --no-cache \
+    python3 \
+    python3-dev \
     musl-dev \
     libffi-dev \
     postgresql-dev \
@@ -8,17 +10,9 @@ RUN apk update && apk add --no-cache \
     jpeg-dev \
     zlib-dev
 
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-COPY requirements.txt ./
-RUN pip install -r requirements.txt
-
-FROM python:3.8-alpine
-RUN apk update && apk add --no-cache \
-    postgresql-dev
-COPY --from=builder /opt/venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR home/
+COPY requirements.txt ./
+RUN pip3 install -r requirements.txt
 COPY ./codehub ./codehub
-COPY ./startup-scripts/backend.sh .
+WORKDIR ./codehub
 CMD celery -A codehub worker -l info
